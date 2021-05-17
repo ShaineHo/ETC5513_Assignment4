@@ -43,7 +43,7 @@ Column {data-width=300}
 
 *Members:*
 
-- *Ambalika Guptau*
+- *Ambalika Gupta*
 - *Smriti Vinayak Bhat*
 - *Yin Shan Ho*
 
