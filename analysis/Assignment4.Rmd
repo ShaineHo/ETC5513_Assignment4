@@ -1,0 +1,60 @@
+---
+title: "Research Topic"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Introduction {.tabset}
+======================
+
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+```
+
+
+
+Column {data-width=300}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Group info
+
+**Team of Thrones**
+
+*Members:*
+
+- *Ambalika Guptau*
+- *Smriti Vinayak Bhat*
+- *Yin Shan Ho*
+
+Skills {.tabset} 
+======================
+
+
+
+
+Talent Migration {.tabset} 
+======================
+
+
+
+
+Employment Growth {.tabset} 
+======================
+
