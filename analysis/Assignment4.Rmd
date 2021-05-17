@@ -8,6 +8,10 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
 ```
 
 Introduction {.tabset}
@@ -46,6 +50,9 @@ Column {data-width=300}
 Skills {.tabset} 
 ======================
 
+```{r read-data}
+skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.xlsx", sheet = "Industry Skills Needs")
+```
 
 
 
@@ -58,3 +65,9 @@ Talent Migration {.tabset}
 Employment Growth {.tabset} 
 ======================
 
+
+
+References {.tabset}
+======================
+
+World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
