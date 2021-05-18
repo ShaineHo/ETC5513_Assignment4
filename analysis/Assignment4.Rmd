@@ -68,20 +68,22 @@ skill_categ_trend <- skills_dataset %>%
   tally()
 
 p <- skill_categ_trend %>%
-  ggplot(aes(x = skill_group_category, y = n)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~isic_section_name) +
+  ggplot(aes(x = skill_group_category, y = n, colour = skill_group_category)) +
+  geom_point(aes(frame = year)) +
+  facet_wrap(~isic_section_name, labeller = label_wrap_gen(25)) +
   coord_flip() +
-  theme_bw(base_size = 12) +
-  theme(strip.text = element_text(size = 12, colour = "black"),
+  theme_bw(base_size = 10) +
+  theme(strip.text = element_text(size = 9, colour = "black"),
         strip.background = element_blank(),
-        axis.title.y = element_blank())
-
-
-p <- p +
-  labs(title = 'Year: {round(frame_time)}') +
-  transition_time(year)
-animate(p,height = 10, width = 12, units = "in", res = 150)
+        axis.title.y = element_blank(),
+        legend.position = "none")
+ggplotly(p)  %>%
+  animation_opts(
+    1000, easing = "elastic", redraw = FALSE
+  ) %>%
+  animation_slider(
+    currentvalue = list(prefix = "YEAR ", font = list(color="black", style = "bold"))
+  )
 ```
 
 
@@ -89,10 +91,27 @@ animate(p,height = 10, width = 12, units = "in", res = 150)
 Column
 --------------------------
 
-### Evolution of Technological skills across industries
+### Trend in change of useful skills across occupations
 
 ```{r}
+tech_trend <- skills_dataset %>%
+  select(year,skill_group_name) %>%
+  group_by(year,skill_group_name) %>%
+  tally() %>%
+  group_by(year) %>%
+  arrange(desc(n), .by_group = TRUE)
 
+tech_trend <- by(tech_trend, tech_trend["year"], head, n=10)
+tech_trend <- Reduce(rbind,tech_trend)
+
+plot_ly(tech_trend) %>%
+  add_bars(
+    x = ~year, y = ~abs(n),
+    frame = ~year, 
+    color = ~skill_group_name,
+    line = list(simplify = FALSE)
+  ) %>%
+  layout(yaxis = list(title = "Skills trend"))
 ```
 
 
