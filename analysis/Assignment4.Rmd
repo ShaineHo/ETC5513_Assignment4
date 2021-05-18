@@ -14,6 +14,7 @@ library(ggplot2)
 library(tidyverse)
 library(gganimate)
 library(plotly)
+library(tibble)
 ```
 
 Introduction {.tabset}
@@ -67,25 +68,40 @@ skill_categ_trend <- skills_dataset %>%
   group_by(year,isic_section_name,skill_group_category) %>%
   tally()
 
-p <- skill_categ_trend %>%
-  ggplot(aes(x = skill_group_category, y = n, colour = skill_group_category)) +
-  geom_point(aes(frame = year)) +
-  facet_wrap(~isic_section_name, labeller = label_wrap_gen(25)) +
-  coord_flip() +
-  theme_bw(base_size = 10) +
-  theme(strip.text = element_text(size = 9, colour = "black"),
-        strip.background = element_blank(),
-        axis.title.y = element_blank(),
-        legend.position = "none")
-ggplotly(p)  %>%
-  animation_opts(
-    1000, easing = "elastic", redraw = FALSE
-  ) %>%
-  animation_slider(
-    currentvalue = list(prefix = "YEAR ", font = list(color="black", style = "bold"))
-  )
+skill_categ_trend$skill_group_category = str_wrap(skill_categ_trend$skill_group_category, width = 10)
+
 ```
 
+```{r}
+cp <- coord_polar(theta='x',start=0,direction=-1)
+cp$is_free <- function() TRUE
+
+p <- skill_categ_trend %>%
+   ggplot(aes(x = skill_group_category, y = n, fill = skill_group_category)) +
+   geom_bar(stat = "identity", width = 1) +
+   facet_wrap(~isic_section_name,ncol = 2, labeller = labeller(isic_section_name = label_wrap_gen(30)), scales = "free") +
+   coord_flip() +
+   theme_bw(base_size = 12) +
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.title.y = element_blank(),
+         axis.title.x = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         axis.ticks = element_blank(),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+    legend.position = 'none',
+    aspect.ratio = 1) +
+  cp
+
+ p <- p +
+   labs(title = 'Year: {round(frame_time)}') +
+   transition_time(year)
+ animate(p,height = 10, width = 7, units = "in", res = 150)
+
+
+```
 
 
 Column
