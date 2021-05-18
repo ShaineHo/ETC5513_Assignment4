@@ -15,6 +15,7 @@ library(tidyverse)
 library(gganimate)
 library(plotly)
 library(tibble)
+library(kableExtra)
 ```
 
 Introduction {.tabset}
@@ -98,10 +99,12 @@ p <- skill_categ_trend %>%
  p <- p +
    labs(title = 'Year: {round(frame_time)}') +
    transition_time(year)
- animate(p,height = 10, width = 7, units = "in", res = 150)
+ animate(p,height = 9, width = 7, units = "in", res = 150)
 
 
 ```
+
+
 
 
 Column
@@ -132,8 +135,32 @@ plot_ly(tech_trend) %>%
 
 
 
+
 ### Analysis
 
+- Soft skills are the one set of skills that people have increasingly found need for across all the verticals.
+- Business skills are finding less and less takers by the year.
+- Specialized industry skills seem to have seen volatility as they were in decline up until 2017-2018 but with the arrival of 2019 they saw a significant boost in demand.
+- Disruptive technological skills do not seem to have caught on yet except for the Information and Communication segment.
+- Mining and Quarrying have seen no disruptive tech skills growth whatsoever.
+- Despite fintech sweeping across the world, among the people employed in the field of financial and insurance activities little to no technical skills seem to be visible.
+
+```{r}
+skills <- unique(tech_trend$skill_group_name)
+```
+- The skill that is the most in demand across all years is `r tech_trend$skill_group_name[1]`.
+- Business Management, Leadership and Teamwork are also right behind. Business Management however has been in decline since 2017 while Teamwork has taken the forefront.
+```{r}
+skills<- data.frame(skills)
+skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_name")) %>%
+  select(skills,skill_group_category) %>%
+  unique() %>%
+  group_by(skill_group_category) %>%
+  tally()
+
+```
+- `r paste(skills_data$skill_group_category[1:4], "-", skills_data$n[1:4], collapse=", ")` are the split across the type of skills. Business skills and Soft skills still dominate.
+- Specialized Industry skills figure in this list too. These are Research and Foreign Languages. In an increasingly interconnected world, it is quite evident why Foreign Languages make this list. Research also forms the corner stone of innovation and is an important skill to possess. Apart from this, Social media is also a technological main stay which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 Talent Migration {.tabset} 
 ======================
@@ -146,7 +173,10 @@ Employment Growth {.tabset}
 
 
 
+
 References {.tabset}
 ======================
 
 World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
+
+Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
