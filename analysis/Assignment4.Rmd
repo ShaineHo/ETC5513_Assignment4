@@ -12,6 +12,8 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(tidyverse)
+library(gganimate)
+library(plotly)
 ```
 
 Introduction {.tabset}
@@ -50,10 +52,52 @@ Column {data-width=300}
 Skills {.tabset} 
 ======================
 
+Column
+--------------------------
+
+### Trend of skill categories across the different verticals by year
+
 ```{r read-data}
 skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.xlsx", sheet = "Industry Skills Needs")
 ```
 
+```{r}
+skill_categ_trend <- skills_dataset %>%
+  select(year, skill_group_category, isic_section_name) %>%
+  group_by(year,isic_section_name,skill_group_category) %>%
+  tally()
+
+p <- skill_categ_trend %>%
+  ggplot(aes(x = skill_group_category, y = n)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~isic_section_name) +
+  coord_flip() +
+  theme_bw(base_size = 12) +
+  theme(strip.text = element_text(size = 12, colour = "black"),
+        strip.background = element_blank(),
+        axis.title.y = element_blank())
+
+
+p <- p +
+  labs(title = 'Year: {round(frame_time)}') +
+  transition_time(year)
+animate(p,height = 10, width = 12, units = "in", res = 150)
+```
+
+
+
+Column
+--------------------------
+
+### Evolution of Technological skills across industries
+
+```{r}
+
+```
+
+
+
+### Analysis
 
 
 Talent Migration {.tabset} 
