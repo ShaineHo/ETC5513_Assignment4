@@ -163,7 +163,7 @@ ggplotly(emp_trend)
 Column {data-width=300}
 -----------------------------------------------------------------------
 
-### Top 10 Employment Growth (Countries)
+### Top 5 Employment Growth (Countries)
 
 ```{r}
 emp_growth_long %>% 
@@ -171,19 +171,19 @@ emp_growth_long %>%
   group_by(country_name, wb_region) %>% 
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange(desc(avg_growth_pct)) %>% 
-  head(10) %>% 
+  head(5) %>% 
   kable(align = "c") %>% 
   kable_styling("striped","hover", font_size = 10)
   
 ```
-### Anaylysis
+### Analysis
 
 - Higher employment growth rate in European and Central Asian Countries
 
 - Most of them have rich mineral/oil resources
 
 
-### Top 10 Employment Growth (Industries)
+### Top 5 Employment Growth (Industries)
 
 ```{r}
 emp_growth_long %>% 
@@ -191,13 +191,13 @@ emp_growth_long %>%
   group_by(industry_name) %>% 
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange(desc(avg_growth_pct)) %>% 
-  head(10) %>% 
+  head(5) %>% 
    kable(align = "c") %>% 
   kable_styling("striped","hover", font_size = 10)
 
 ```
 
-### Top 10 Employment Recession (Industries)
+### Top 5 Employment Recession (Industries)
 
 ```{r}
 emp_growth_long %>% 
@@ -205,7 +205,7 @@ emp_growth_long %>%
   group_by(industry_name) %>% 
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange((avg_growth_pct)) %>% 
-  head(10) %>% 
+  head(5) %>% 
   kable(align = "c") %>% 
   kable_styling("striped","hover", font_size = 10)
 ```
