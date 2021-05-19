@@ -12,6 +12,10 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(tidyverse)
+library(gganimate)
+library(plotly)
+library(tibble)
+library(kableExtra)
 ```
 
 Introduction {.tabset}
@@ -50,11 +54,113 @@ Column {data-width=300}
 Skills {.tabset} 
 ======================
 
+Column
+--------------------------
+
+### Trend of skill categories across the different verticals by year
+
 ```{r read-data}
 skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.xlsx", sheet = "Industry Skills Needs")
 ```
 
+```{r}
+skill_categ_trend <- skills_dataset %>%
+  select(year, skill_group_category, isic_section_name) %>%
+  group_by(year,isic_section_name,skill_group_category) %>%
+  tally()
 
+skill_categ_trend$skill_group_category = str_wrap(skill_categ_trend$skill_group_category, width = 10)
+
+```
+
+```{r}
+cp <- coord_polar(theta='x',start=0,direction=-1)
+cp$is_free <- function() TRUE
+
+p <- skill_categ_trend %>%
+   ggplot(aes(x = skill_group_category, y = n, fill = skill_group_category)) +
+   geom_bar(stat = "identity", width = 1) +
+   facet_wrap(~isic_section_name,ncol = 2, labeller = labeller(isic_section_name = label_wrap_gen(30)), scales = "free") +
+   coord_flip() +
+   theme_bw(base_size = 12) +
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.title.y = element_blank(),
+         axis.title.x = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         axis.ticks = element_blank(),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+    legend.position = 'none',
+    aspect.ratio = 1) +
+  cp
+
+ p <- p +
+   labs(title = 'Year: {round(frame_time)}') +
+   transition_time(year)
+ animate(p,height = 9, width = 7, units = "in", res = 150)
+
+
+```
+
+
+
+
+Column
+--------------------------
+
+### Trend in change of useful skills across occupations
+
+```{r}
+tech_trend <- skills_dataset %>%
+  select(year,skill_group_name) %>%
+  group_by(year,skill_group_name) %>%
+  tally() %>%
+  group_by(year) %>%
+  arrange(desc(n), .by_group = TRUE)
+
+tech_trend <- by(tech_trend, tech_trend["year"], head, n=10)
+tech_trend <- Reduce(rbind,tech_trend)
+
+plot_ly(tech_trend) %>%
+  add_bars(
+    x = ~year, y = ~abs(n),
+    frame = ~year, 
+    color = ~skill_group_name,
+    line = list(simplify = FALSE)
+  ) %>%
+  layout(yaxis = list(title = "Skills trend"))
+```
+
+
+
+
+### Analysis
+
+- Soft skills are the one set of skills that people have increasingly found need for across all the verticals.
+- Business skills are finding less and less takers by the year.
+- Specialized industry skills seem to have seen volatility as they were in decline up until 2017-2018 but with the arrival of 2019 they saw a significant boost in demand.
+- Disruptive technological skills do not seem to have caught on yet except for the Information and Communication segment.
+- Mining and Quarrying have seen no disruptive tech skills growth whatsoever.
+- Despite fintech sweeping across the world, among the people employed in the field of financial and insurance activities little to no technical skills seem to be visible.
+
+```{r}
+skills <- unique(tech_trend$skill_group_name)
+```
+- The skill that is the most in demand across all years is `r tech_trend$skill_group_name[1]`.
+- Business Management, Leadership and Teamwork are also right behind. Business Management however has been in decline since 2017 while Teamwork has taken the forefront.
+```{r}
+skills<- data.frame(skills)
+skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_name")) %>%
+  select(skills,skill_group_category) %>%
+  unique() %>%
+  group_by(skill_group_category) %>%
+  tally()
+
+```
+- `r paste(skills_data$skill_group_category[1:4], "-", skills_data$n[1:4], collapse=", ")` are the split across the type of skills. Business skills and Soft skills still dominate.
+- Specialized Industry skills figure in this list too. These are Research and Foreign Languages. In an increasingly interconnected world, it is quite evident why Foreign Languages make this list. Research also forms the corner stone of innovation and is an important skill to possess. Apart from this, Social media is also a technological main stay which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 Talent Migration {.tabset} 
 ======================
@@ -67,7 +173,10 @@ Employment Growth {.tabset}
 
 
 
+
 References {.tabset}
 ======================
 
 World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
+
+Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
