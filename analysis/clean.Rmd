@@ -1,0 +1,64 @@
+---
+title: "Cleaning data"
+author: "Team_of_Thrones"
+date: "5/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(tidyverse)
+```
+
+# Research Topic
+
+
+## Skills 
+
+*Researcher: Smriti Vinayak Bhat*
+
+```{r}
+
+```
+
+
+
+
+## Talent Migration
+
+*Researcher: Ambalika Guptau*
+
+
+```{r}
+
+```
+
+
+
+
+
+## Employment Growth 
+
+*Researcher: Yin Shan Ho*
+
+```{r}
+#import data
+emp_growth_raw <- read_excel("../data/public_use-industry-employment-growth.xlsx", 
+    sheet = "Growth from Industry Transition")
+```
+
+```{r}
+# clean data
+emp_growth <- emp_growth_raw %>% 
+  rename( "2015" = growth_rate_2015, 
+          "2016" = growth_rate_2016, 
+          "2017" = growth_rate_2017, 
+          "2018" = growth_rate_2018, 
+          "2019" = growth_rate_2019) 
+
+write_excel_csv(emp_growth, "../clean_data/emp_growth.csv")
+
+```
+
+
