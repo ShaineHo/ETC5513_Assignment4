@@ -279,7 +279,7 @@ emp_growth_long %>%
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange(desc(avg_growth_pct)) %>% 
   head(5) %>% 
-  kable(align = "c") %>% 
+  kable(align = "c", col.names = c("country name", "region", "average perentage of growth")) %>% 
   kable_styling("striped","hover", font_size = 10)
   
 ```
@@ -299,7 +299,7 @@ emp_growth_long %>%
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange(desc(avg_growth_pct)) %>% 
   head(5) %>% 
-   kable(align = "c") %>% 
+   kable(align = "c", col.names = c("industry name", "average persentage of growth")) %>% 
   kable_styling("striped","hover", font_size = 10)
 
 ```
@@ -313,7 +313,7 @@ emp_growth_long %>%
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange((avg_growth_pct)) %>% 
   head(5) %>% 
-  kable(align = "c") %>% 
+  kable(align = "c", col.names = c("industry name", "average percentage of growth")) %>% 
   kable_styling("striped","hover", font_size = 10)
 ```
 
