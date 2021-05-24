@@ -239,26 +239,26 @@ Column {data-width=300}
 ```{r}
 talentmig_country %>% 
   filter(Year == "2019") %>% 
-  group_by(base_country_name, base_country_wb_region) %>% 
+  group_by(base_country_name) %>% 
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(netmigration) %>% 
   head(10) %>% 
-  knitr::kable(caption = "Top 10 countries with highest migration") %>% 
-  kable_material_dark() 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 15)
   
 ```
 
-### Most Immigrants
+### Top 10 countries with Highest Number of Immigrants
 
 ```{r}
 talentmig_country %>% 
   filter(Year == "2019") %>% 
-  group_by(base_country_name, base_country_wb_region) %>% 
+  group_by(base_country_name) %>% 
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(desc(netmigration)) %>% 
   head(10) %>% 
-  knitr::kable(caption = "Top 10 countries with highest migration") %>% 
-  kable_material_dark() 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 15)
   
 ```
 
