@@ -8,10 +8,19 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-library(readxl)
-library(dplyr)
-library(ggplot2)
 library(tidyverse)
+library(plotly)
+library(dplyr)
+library(kableExtra)
+library(rnaturalearth)
+library(viridis)
+library(sf)
+library(RColorBrewer)
+library(rgeos)
+library(gifski)
+library(readxl)
+library(gganimate)
+library(tibble)
 ```
 
 Introduction {.tabset}
@@ -50,11 +59,114 @@ Column {data-width=300}
 Skills {.tabset} 
 ======================
 
+Column
+--------------------------
+
+### Trend of skill categories across the different verticals by year
+
 ```{r read-data}
 skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.xlsx", sheet = "Industry Skills Needs")
 ```
 
+```{r}
+skill_categ_trend <- skills_dataset %>%
+  select(year, skill_group_category, isic_section_name) %>%
+  group_by(year,isic_section_name,skill_group_category) %>%
+  tally()
 
+skill_categ_trend$skill_group_category = str_wrap(skill_categ_trend$skill_group_category, width = 10)
+
+```
+
+```{r}
+cp <- coord_polar(theta='x',start=0,direction=-1)
+cp$is_free <- function() TRUE
+
+p <- skill_categ_trend %>%
+   ggplot(aes(x = skill_group_category, y = n, fill = skill_group_category)) +
+   geom_bar(stat = "identity", width = 1) +
+   facet_wrap(~isic_section_name,ncol = 2, labeller = labeller(isic_section_name = label_wrap_gen(30)), scales = "free") +
+   coord_flip() +
+   theme_bw(base_size = 12) +
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.title.y = element_blank(),
+         axis.title.x = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         axis.ticks = element_blank(),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+    legend.position = 'none',
+    aspect.ratio = 1) +
+  cp
+
+ p <- p +
+   labs(title = 'Year: {round(frame_time)}') +
+   transition_time(year)
+ animate(p,height = 9, width = 7, units = "in", res = 150)
+
+
+```
+
+
+
+
+Column
+--------------------------
+
+### Trend in change of useful skills across occupations
+
+```{r}
+tech_trend <- skills_dataset %>%
+  select(year,skill_group_name) %>%
+  group_by(year,skill_group_name) %>%
+  tally() %>%
+  group_by(year) %>%
+  arrange(desc(n), .by_group = TRUE)
+
+tech_trend <- by(tech_trend, tech_trend["year"], head, n=10)
+tech_trend <- Reduce(rbind,tech_trend)
+
+plot_ly(tech_trend) %>%
+  add_bars(
+    x = ~year, y = ~abs(n),
+    frame = ~year, 
+    color = ~skill_group_name,
+    line = list(simplify = FALSE)
+  ) %>%
+  layout(yaxis = list(title = "Skills trend"))
+```
+
+
+
+
+### Analysis
+
+- _Soft skills_ are the one set of skills that people have **increasingly found need** for across all the verticals.
+- _Business skills_ are finding **less and less takers** by the year.
+- _Specialized industry skills_ seem to have seen volatility as they were **in decline up until 2017-2018** but with the **arrival of 2019 they saw a significant boost in demand**.
+- _Disruptive technological skills_ **do not seem to have caught on** yet except for the Information and Communication segment.
+- _Mining and Quarrying_ have seen **no disruptive tech skills growth** whatsoever.
+- Despite fintech sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
+
+```{r}
+skills <- unique(tech_trend$skill_group_name)
+```
+- The skill that is the most in demand across all years is _`r tech_trend$skill_group_name[1]`_.
+- _Business Management, Leadership and Teamwork_ are also right behind. _Business Management_ however has been **in decline since 2017** while _Teamwork_ has **taken the forefront**.
+```{r}
+skills<- data.frame(skills)
+skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_name")) %>%
+  select(skills,skill_group_category) %>%
+  unique() %>%
+  group_by(skill_group_category) %>%
+  tally()
+
+
+```
+- _`r paste(skills_data$skill_group_category[1:4], "-", skills_data$n[1:4], collapse=", ")`_ are the split across the type of skills. _Business skills_ and _Soft skills_ still **dominate**.
+- _Specialized Industry skills_ figure in this list too. These are _Research_ and _Foreign Languages_. In an **increasingly interconnected world**, it is quite evident why _Foreign Languages_ make this list. _Research_ also forms the **corner stone of innovation** and is an important skill to possess. Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 Talent Migration {.tabset} 
 ======================
@@ -66,8 +178,174 @@ Employment Growth {.tabset}
 ======================
 
 
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+### Global trend of employment growth rate
+
+```{r}
+# import data
+emp_growth <- read_csv("../clean_data/emp_growth.csv")
+```
+
+```{r}
+emp_growth_long <- emp_growth %>% 
+  pivot_longer(cols = c("2015":"2019"), names_to = "year", values_to = "growth_rate") 
+
+emp_growth_global <- emp_growth_long %>% 
+  select(!c(isic_section_index, industry_id)) %>% 
+  group_by(country_name, year) %>% 
+  summarise(avg_growth_rate = mean(growth_rate))
+
+emp_loc <- emp_growth_global %>%
+  mutate(country_name = recode(country_name,
+                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
+                             "Dominican Republic" = "Dominica" ,
+                             `Egypt, Arab Rep.` = "Egypt" ,
+                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
+                             `Iran, Islamic Rep.` = "Iran",
+                             `Korea, Rep.` = "	South Korea",
+                             "United States" = "United States of America",
+                             "Tanzania" = "United Republic of Tanzania",
+                          "Taiwan, China" = "Taiwan",
+                          "Venezuela, RB" = "Venezuela",
+                          `Yemen, Rep.` = "Yemen"  ,
+                          "Serbia" = "Republic of Serbia"  ))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin)
+
+`full.list.map.time` <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin) %>% 
+  right_join(emp_growth_global, by = c("admin" = "country_name")) 
+
+emp_map  <- ggplot()+
+  geom_sf(data = countries, fill = NA)+
+  geom_sf(data = `full.list.map.time` %>% 
+            filter(!is.na(year)), mapping = aes(fill = avg_growth_rate))+
+  scale_fill_viridis(na.value="white")+
+  labs(title = "Change of employment growth rate",
+       subtitle = "Year: {current_frame}",
+       fill = "Growth_rate")+
+  theme_bw()+
+  transition_manual(year)
+
+animate(emp_map, duration = 8, fps = 20, width = 1000, height = 500, renderer = gifski_renderer())
+
+```
+
+
+### Trend of employment growth rate in different industries
+
+```{r fig.height=4}
+emp_growth_new <- emp_growth %>% 
+  pivot_longer(cols = c("2015":"2019"), names_to = "year", values_to = "growth_rate") %>% 
+  select(!c(isic_section_index, industry_id))
+
+emp_trend <- emp_growth_new %>% 
+  group_by(isic_section_name, year, wb_income) %>% 
+  summarise(avg_growth_rate = mean(growth_rate)*100) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  ggplot(aes(x = year,
+             y = avg_growth_rate,
+             color = isic_section_name))+
+  geom_line()+
+  facet_wrap(~wb_income, ncol = 2)+
+      theme(legend.position="bottom")+
+  theme_bw()
+
+ggplotly(emp_trend) 
+```
+
+### Analysis
+
+- *Global decrease* in the growth rate of employment
+
+- Most of the income groups have *increasing trend* of employment rate except from high income group
+
+- Rapid development in *Information and communication Section*
+
+- Decreasing trend observed in Mining and Quarrying sections in *High* and *Upper Middle Income* group
+
+
+Column {data-width=300}
+-----------------------------------------------------------------------
+
+### Top 5 Employment Growth (Countries)
+
+```{r}
+emp_growth_long %>% 
+  select(country_name, wb_region, year, growth_rate) %>% 
+  group_by(country_name, wb_region) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange(desc(avg_growth_pct)) %>% 
+  head(5) %>% 
+  kable(align = "c", col.names = c("country name", "region", "average perentage of growth")) %>% 
+  kable_styling("striped","hover", font_size = 10)
+  
+```
+### Analysis
+
+- Higher employment growth rate in European and Central Asian Countries
+
+- Most of them have rich mineral/oil resources
+
+
+### Top 5 Employment Growth (Industries)
+
+```{r}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange(desc(avg_growth_pct)) %>% 
+  head(5) %>% 
+   kable(align = "c", col.names = c("industry name", "average persentage of growth")) %>% 
+  kable_styling("striped","hover", font_size = 10)
+
+```
+
+### Top 5 Employment Recession (Industries)
+
+```{r}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange((avg_growth_pct)) %>% 
+  head(5) %>% 
+  kable(align = "c", col.names = c("industry name", "average percentage of growth")) %>% 
+  kable_styling("striped","hover", font_size = 10)
+```
+
+### Analysis
+
+**Rapid Development in:**
+
+1. Infrastructure
+
+2. Information Technology
+
+3. Equity Management
+
+4. Environment Protection
+
+**Rapid Recession in:**
+
+1. Traditional Media
+
+2. Traditional Communication
+
+
+
+
 
 References {.tabset}
 ======================
 
 World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
+
+World Bank. (n.d.). Employment Growth | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/employment-growth-linkedin-data
+
+Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
+
