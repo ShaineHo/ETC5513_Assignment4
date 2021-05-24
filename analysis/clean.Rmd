@@ -49,10 +49,12 @@ talent_migration_country <- separate(talent_migration_country, Year, into = c("A
 talent_migration_skill <- separate(talent_migration_skill, Year, into = c("A", "B", "C", "Year"), sep = "_")
 
 talent_migration_country <- talent_migration_country %>% 
-  select(-A, -B, -C)
+  select(-A, -B, -C) %>% 
+  mutate(Year = as.numeric(Year))
 
 talent_migration_skill <- talent_migration_skill %>% 
-  select(-A, -B, -C)
+  select(-A, -B, -C) %>% 
+  mutate(Year = as.numeric(Year))
 
 write.csv(talent_migration_country, "../clean_data/talent_migration_country.csv")
 

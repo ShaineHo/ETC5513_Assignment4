@@ -21,6 +21,10 @@ library(gifski)
 library(readxl)
 library(gganimate)
 library(tibble)
+library(ggplot2)
+library(ggrepel)
+library(rworldmap)
+
 ```
 
 Introduction {.tabset}
@@ -172,13 +176,92 @@ Talent Migration {.tabset}
 ======================
 
 Column {data-width=700}
------------------------------------------------------------------------
+---------------------------------------------------
 
-### Global trend of employment growth rate
+### Migration Pattern to USA from other countries
 
 ```{r}
 
+talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
+
+talent_usa <- talentmig_country %>% 
+  filter(target_country_name == "United States") %>% 
+  filter(Net_Migration < 0)
+
+worldmap <- borders("world", colour="#ebc26c", fill="#ebc26c")
+
+migrationusa <- ggplot() + worldmap + 
+ geom_point(data=talent_usa, 
+            aes(x = base_long, y = base_lat, fill = Net_Migration), 
+            col = "blue", 
+            size = 1.5) +
+  labs(title = "Migration Pattern to USA from other countries")
+
+ggplotly(migrationusa)
+
 ```
+
+
+
+### Top Skills in demand in 2019
+
+```{r}
+
+talentmig_skill <- read.csv("../clean_data/talent_migration_skill.csv")
+
+talent_mig_plot <- talentmig_skill %>% 
+  group_by(skill_group_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  head(20) %>% 
+  ggplot(., aes(x=skill_group_name, y=netmigration)) + 
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+talent_mig_plot
+
+```
+
+
+### Analysis
+
+- It is observed that the top 3 out 10 countries with the highest number of net migrant arrivals are from the European region
+- We can observe that the top countries with people migrating from in search of jobs belong to Sub-Saharan African continent.
+- It is observed that USA has maximum number of immigrants from Europe and and Africa in the year 2019
+
+
+
+Column {data-width=300}
+---------------------------------------------------
+
+### Highest Migration Rate
+
+```{r}
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name, base_country_wb_region) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(netmigration) %>% 
+  head(10) %>% 
+  knitr::kable(caption = "Top 10 countries with highest migration") %>% 
+  kable_material_dark() 
+  
+```
+
+### Most Immigrants
+
+```{r}
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name, base_country_wb_region) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  head(10) %>% 
+  knitr::kable(caption = "Top 10 countries with highest migration") %>% 
+  kable_material_dark() 
+  
+```
+
 
 
 
