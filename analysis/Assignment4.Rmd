@@ -112,7 +112,7 @@ p <- skill_categ_trend %>%
 
 
 
-Column
+Column{.tabset}
 --------------------------
 
 ### Trend in change of useful skills across occupations
@@ -170,6 +170,15 @@ skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_n
 
 Talent Migration {.tabset} 
 ======================
+
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+### Global trend of employment growth rate
+
+```{r}
+
+```
 
 
 

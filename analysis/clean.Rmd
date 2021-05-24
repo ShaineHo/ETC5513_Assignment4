@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
 library(tidyverse)
+library(tidyr)
 ```
 
 # Research Topic
@@ -31,9 +32,34 @@ library(tidyverse)
 
 
 ```{r}
+talent_migration_country <- read_excel("../data/public_use-talent-migration.xlsx", sheet = "Country Migration")
+talent_migration_skill <- read_excel("../data/public_use-talent-migration.xlsx", sheet = "Skill Migration")
 
 ```
 
+```{r}
+talent_migration_country <- talent_migration_country %>% 
+  pivot_longer(cols = c('net_per_10K_2015':'net_per_10K_2019'), names_to = "Year", values_to = "Net_Migration")
+
+talent_migration_skill <- talent_migration_skill %>% 
+  pivot_longer(cols = c(net_per_10K_2015:net_per_10K_2019), names_to = "Year", values_to = "Net_Migration")
+
+talent_migration_country <- separate(talent_migration_country, Year, into = c("A", "B", "C", "Year"), sep = "_")
+
+talent_migration_skill <- separate(talent_migration_skill, Year, into = c("A", "B", "C", "Year"), sep = "_")
+
+talent_migration_country <- talent_migration_country %>% 
+  select(-A, -B, -C)
+
+talent_migration_skill <- talent_migration_skill %>% 
+  select(-A, -B, -C)
+
+write.csv(talent_migration_country, "../clean_data/talent_migration_country.csv")
+
+write.csv(talent_migration_skill , "../clean_data/talent_migration_skill.csv")
+
+
+```
 
 
 
