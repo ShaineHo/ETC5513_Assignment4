@@ -51,7 +51,7 @@ The World Bank Group - Linkedin Digital Data for Development attempts to harness
 
 - Excel: Industry Skills Needs
 - Excel: Talent Migration
-- 
+- Excel: Employment Growth
 
 
 Column {data-width=400}
@@ -68,11 +68,11 @@ Column {data-width=400}
 - *Smriti Vinayak Bhat*
 - *Yin Shan Ho*
 
-### .
+### Imagine
 
 
-```{r fig, echo=FALSE, fig.cap=" ", out.width = " "}
-knitr::include_graphics("meme1.jpg")
+```{r fig1, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme2.jpg")
 ```
 
 Skills {.tabset} 
@@ -478,14 +478,26 @@ emp_growth_long %>%
 Conclusion {.tabset}
 ====================
 
+Column
+-------------------------------------------------------
+
+#### Conclusion
+
 Professionals in today's day and time are always looking for opportunities to grow in terms of their career. There are multiple aspects to this growth and the environment needed to enrich the growth.
 
 Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
 
 As one upskills, they find it harder to stay stationary within their old environment and migrate to greener pastures. This has been represented in 
 
-However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. 
+However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
 
+------------------------------------------------------------------
+
+#### Thank You and hope you can all get a good job in the future
+
+```{r fig2, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme1.jpg")
+```
 
 References {.tabset}
 ======================
