@@ -1,5 +1,5 @@
 ---
-title: "Research Topic"
+title: "Analysis of Employment Trends"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -19,30 +19,44 @@ library(rgeos)
 library(gifski)
 library(readxl)
 library(gganimate)
+library(ggrepel)
+library(rworldmap)
+library(jpeg)
 ```
 
 Introduction {.tabset}
 ======================
 
-Column {data-width=700}
+Column {data-width=600}
 -----------------------------------------------------------------------
 
-### Chart A
+### Background
 
-```{r}
+LinkedIn is an illustrious website that helps professionals connect with one another. It is also a portal for people to display their skills as well as the path that their career has taken through the years. It contains a variety of information ranging from education, knowledge to checkpoints in their career.
 
-```
+Employers also use this platform for recruiting professionals. So it is a useful tool which is slowly becoming a necessity for people entering into the corporate world. Navigation and understanding crucial skills for their profession of choice and the location they would flourish goes a long way in crafting a successful career.
+
+### Approach of Project
+
+The report will be charting the trends in LinkedIn across all fields. It will be delving into the kind of skills that are gaining or losing popularity across different verticals as well as what the top few must have skills are for all working professionals.
+
+The other useful component for young professionals is what the migration trends are with respect to their skills and which place would give them space to learn and display their potential.
+
+The final aspect but supremely important one is whether the global employment trends are conducive to their growth. Only upon knowing this aspect is it possible for them to decide whether migration is a good option or upskilling is necessary.
 
 
+### Information on Data
 
-Column {data-width=300}
+The World Bank Group - Linkedin Digital Data for Development attempts to harness LinkedIn data covering more than 100 countries. For the purpose of this report the following datasets will be accessed:
+
+- Excel: Industry Skills Needs
+- Excel: Talent Migration
+- 
+
+
+Column {data-width=400}
 -----------------------------------------------------------------------
 
-### Chart B
-
-```{r}
-
-```
 
 ### Group info
 
@@ -53,6 +67,13 @@ Column {data-width=300}
 - *Ambalika Gupta*
 - *Smriti Vinayak Bhat*
 - *Yin Shan Ho*
+
+### .
+
+
+```{r fig, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme1.jpg")
+```
 
 Skills {.tabset} 
 ======================
@@ -110,7 +131,7 @@ p <- skill_categ_trend %>%
 
 
 
-Column
+Column {data-width=500}
 --------------------------
 
 ### Trend in change of useful skills across occupations
@@ -169,6 +190,142 @@ skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_n
 Talent Migration {.tabset} 
 ======================
 
+Column {data-width=700}
+---------------------------------------------------
+
+### Migration Pattern to USA from other countries
+
+```{r}
+
+talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
+
+talent_usa <- talentmig_country %>% 
+  filter(target_country_name == "United States") %>% 
+  filter(Net_Migration < 0)
+
+worldmap <- borders("world", colour="#ebc26c", fill="#ebc26c")
+
+migrationusa <- ggplot() + worldmap + 
+ geom_point(data=talent_usa, 
+            aes(x = base_long, y = base_lat, fill = Net_Migration), 
+            col = "blue", 
+            size = 1.5) +
+  labs(title = "Migration Pattern to USA from other countries") +
+  theme_bw()
+
+ggplotly(migrationusa)
+
+```
+
+
+### Industry migration trend from the year 2015-2019
+
+```{r}
+
+talentmig_industry <- read.csv("../clean_data/talent_migration_industry.csv")
+
+talentmig_industry_summary <- talentmig_industry %>% 
+  group_by(industry_name, Year) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  na.omit(industry_name)
+
+talent <- talentmig_industry_summary %>% 
+  group_by(Year) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x=industry_name, y = netmigration, fill = Year)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Year, scales = "free_y", ncol = 2)+
+  coord_flip() +
+  labs(title = "Industry Migration trend from 2015-2019",
+           y = "Industry",
+           x = "Year") +
+  theme_bw() +
+  theme(axis.text.y=element_text(size = rel(0.75), margin = margin(1, unit = "cm"),vjust =1))
+
+ggplotly(talent)
+
+```
+
+
+### Skill migration trend from the year 2015-2019
+
+```{r}
+
+talentmig_skill <- read_csv("../clean_data/talent_migration_skill.csv")
+
+talentmig_skill_summary <- talentmig_skill %>% 
+  group_by(skill_group_name, skill_group_category, Year) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  na.omit(skill_group_name)
+g <- talentmig_skill_summary %>%
+  group_by(skill_group_category) %>% 
+  top_n(20) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
+  geom_col() + labs(y="Skills", x = "Year") +
+  facet_wrap(~skill_group_category, ncol = 5) +
+  theme_bw() + 
+  theme(
+  axis.title.x = element_text(size = 10, face = "bold"),
+  axis.title.y = element_text(size = 10, face = "bold"),
+  axis.text.x = element_text(size = 8)) +
+  guides(fill=guide_legend("Skill Name"))
+
+fig <- ggplotly(g)
+fig
+
+```
+
+
+
+
+Column {data-width=300}
+---------------------------------------------------
+
+### Highest Migration Rate
+
+```{r}
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(netmigration) %>% 
+  head(10) %>% 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 15)
+  
+```
+
+### Top 10 countries with Highest Number of Immigrants
+
+```{r}
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  head(10) %>% 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 15)
+  
+```
+
+### Analysis
+
+- Top 3 out 10 countries with the highest number of *net migrant arrivals* are from the *European region*
+- Top countries with people *migrating from*, in search of jobs belong to *Sub-Saharan African continent*.
+- It is observed that *USA has maximum number of immigrants from Europe and and Africa* in the year 2019
+- Industries like *Finance* - __Venture Capital and Private Equity__, *Tech Sector* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals from other industries. *E-Learning* and *Outsourcing/Offshoring* is an upcoming industry with increasing arrivals.
+- In *Business Skill category*, maximum arrivals are in __Debt Collection skill__
+- In *Disruptive Tech Skill category*, maximum and consistent arrivals are in __Fintech sector__. Also __Aerospace Engineering__ showing a consistent trend of departures
+-In *Soft Skill category*, __Persuasion skills__ have shown consistency with maximum arrivals. These skills are the need of the hour with increasing sales and marketing trend. 
+- *Specialised Industry* category shows an upcoming trend in skills like __Nuclear Physics, Oral Comprehension & Psychiatry__
+- *Tech Skills category* shows a consistent trend for __Data-Driven Analytics__, with __Web hosting__ being next in line. 
 
 
 
@@ -318,14 +475,28 @@ emp_growth_long %>%
 
 
 
+Conclusion {.tabset}
+====================
+
+Professionals in today's day and time are always looking for opportunities to grow in terms of their career. There are multiple aspects to this growth and the environment needed to enrich the growth.
+
+Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
+
+As one upskills, they find it harder to stay stationary within their old environment and migrate to greener pastures. This has been represented in 
+
+However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. 
 
 
 References {.tabset}
 ======================
 
+World Bank Group - LinkedIn. (n.d.). World Bank LinkedIn Digital Data for Development. Industry Jobs and Skills Trends. Retrieved May 25, 2021, from https://linkedindata.worldbank.org
+
 World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
 
 World Bank. (n.d.). Employment Growth | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/employment-growth-linkedin-data
+
+World Bank. (n.d.). Migration | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/talent-migration-linkedin-data
 
 Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
 
@@ -368,3 +539,11 @@ World Economic Situation And Prospects: September 2019 Briefing, No. 130 | Depar
   
     Thomas Lin Pedersen and David Robinson (2020). gganimate: A Grammar of Animated Graphics. R package
   version 1.0.7. https://CRAN.R-project.org/package=gganimate
+  
+    Kamil Slowikowski (2021). ggrepel: Automatically Position Non-Overlapping Text Labels with 'ggplot2'. R
+  package version 0.9.1. https://CRAN.R-project.org/package=ggrepel
+  
+    South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.
+    
+   Simon Urbanek (2019). jpeg: Read and write JPEG images. R package version 0.1-8.1.
+  https://CRAN.R-project.org/package=jpeg   
