@@ -10,7 +10,6 @@ output:
 library(flexdashboard)
 library(tidyverse)
 library(plotly)
-library(dplyr)
 library(kableExtra)
 library(rnaturalearth)
 library(viridis)
@@ -20,8 +19,6 @@ library(rgeos)
 library(gifski)
 library(readxl)
 library(gganimate)
-library(tibble)
-library(ggplot2)
 library(ggrepel)
 library(rworldmap)
 library(jpeg)
@@ -54,7 +51,7 @@ The World Bank Group - Linkedin Digital Data for Development attempts to harness
 
 - Excel: Industry Skills Needs
 - Excel: Talent Migration
-- 
+- Excel: Employment Growth
 
 
 Column {data-width=400}
@@ -71,11 +68,11 @@ Column {data-width=400}
 - *Smriti Vinayak Bhat*
 - *Yin Shan Ho*
 
-### .
+### Imagine
 
 
-```{r fig, echo=FALSE, fig.cap=" ", out.width = " "}
-knitr::include_graphics("meme1.jpg")
+```{r fig1, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme2.jpg")
 ```
 
 Skills {.tabset} 
@@ -453,7 +450,7 @@ emp_map  <- ggplot()+
   theme_bw()+
   transition_manual(year)
 
-animate(emp_map, duration = 8, fps = 20, width = 1000, height = 500, renderer = gifski_renderer())
+animate(emp_map, duration = 5, fps = 20, width = 1000, height = 500, renderer = gifski_renderer())
 
 ```
 
@@ -472,6 +469,7 @@ emp_trend <- emp_growth_new %>%
   ggplot(aes(x = year,
              y = avg_growth_rate,
              color = isic_section_name))+
+  labs(color = "Section Name")+
   geom_line()+
   facet_wrap(~wb_income, ncol = 2)+
       theme(legend.position="bottom")+
@@ -482,39 +480,20 @@ ggplotly(emp_trend)
 
 ### Analysis
 
-- *Global decrease* in the growth rate of employment
+- *Recovering* from the financial crisis but *slowing down* in the growth rate.
 
-- Most of the income groups have *increasing trend* of employment rate except from high income group
+- Most of the income groups have *increasing trend* of employment rate except from high income group.
 
-- Rapid development in *Information and communication Section*
+- Rapid development in *Information and communication Section*.
 
-- Decreasing trend observed in Mining and Quarrying sections in *High* and *Upper Middle Income* group
+- Decreasing trend observed in Mining and Quarrying sections in *High* and *Upper Middle Income* group. 
+
 
 
 Column {data-width=300}
 -----------------------------------------------------------------------
 
-### Top 5 Employment Growth (Countries)
-
-```{r}
-emp_growth_long %>% 
-  select(country_name, wb_region, year, growth_rate) %>% 
-  group_by(country_name, wb_region) %>% 
-  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
-  arrange(desc(avg_growth_pct)) %>% 
-  head(5) %>% 
-  kable(align = "c", col.names = c("country name", "region", "average perentage of growth")) %>% 
-  kable_styling("striped","hover", font_size = 10)
-  
-```
-### Analysis
-
-- Higher employment growth rate in European and Central Asian Countries
-
-- Most of them have rich mineral/oil resources
-
-
-### Top 5 Employment Growth (Industries)
+### Top 10 Employment Growth (Industries)
 
 ```{r}
 emp_growth_long %>% 
@@ -522,13 +501,13 @@ emp_growth_long %>%
   group_by(industry_name) %>% 
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange(desc(avg_growth_pct)) %>% 
-  head(5) %>% 
+  head(10) %>% 
    kable(align = "c", col.names = c("industry name", "average persentage of growth")) %>% 
-  kable_styling("striped","hover", font_size = 10)
+  kable_styling("striped","hover", font_size = 13)
 
 ```
 
-### Top 5 Employment Recession (Industries)
+### Top 10 Employment Recession (Industries)
 
 ```{r}
 emp_growth_long %>% 
@@ -536,9 +515,9 @@ emp_growth_long %>%
   group_by(industry_name) %>% 
   summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
   arrange((avg_growth_pct)) %>% 
-  head(5) %>% 
+  head(10) %>% 
   kable(align = "c", col.names = c("industry name", "average percentage of growth")) %>% 
-  kable_styling("striped","hover", font_size = 10)
+  kable_styling("striped","hover", font_size = 13)
 ```
 
 ### Analysis
@@ -564,14 +543,26 @@ emp_growth_long %>%
 Conclusion {.tabset}
 ====================
 
+Column
+-------------------------------------------------------
+
+#### Conclusion
+
 Professionals in today's day and time are always looking for opportunities to grow in terms of their career. There are multiple aspects to this growth and the environment needed to enrich the growth.
 
 Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
 
 As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics, Fintech, Nanotechnology and soft skills like Persuasion has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology and the growing stock markets and startup culture looking at the Venture Capital and Private Equity industry trend.
 
-However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. 
+However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
 
+------------------------------------------------------------------
+
+#### Thank You and hope you can all get a good job in the future
+
+```{r fig2, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme1.jpg")
+```
 
 References {.tabset}
 ======================
@@ -586,5 +577,53 @@ World Bank. (n.d.). Migration | LinkedIn Data | Data Catalog. Retrieved May 17, 
 
 Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
 
+Global Economic Prospects to Improve in 2015, But Divergent Trends Pose Downside Risks, Says WB. (2015, January 13). Retrieved May 25, 2021, from https://www.worldbank.org/en/news/press-release/2015/01/13/global-economic-prospects-improve-2015-divergent-trends-pose-downside-risks
+
+World Economic Situation And Prospects: September 2019 Briefing, No. 130 | Department of Economic and Social Affairs. (2019, September 1). Retrieved May 25, 2021, from https://www.un.org/development/desa/dpad/publication/world-economic-situation-and-prospects-september-2019-briefing-no-130/
+
+  Richard Iannone, JJ Allaire and Barbara Borges (2020). flexdashboard: R Markdown Format for Flexible
+  Dashboards. R package version 0.5.2. https://CRAN.R-project.org/package=flexdashboard
+
+  Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686,
+  https://doi.org/10.21105/joss.01686
+  
+    C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC
+  Florida, 2020.
+  
+    Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version
+  1.3.4. https://CRAN.R-project.org/package=kableExtra
+
+  Andy South (2017). rnaturalearth: World Map Data from Natural Earth. R package version 0.1.0.
+  https://CRAN.R-project.org/package=rnaturalearth
+  
+   Simon Garnier, Noam Ross, Robert Rudis, Antônio P. Camargo, Marco Sciaini, and Cédric Scherer (2021).
+  Rvision - Colorblind-Friendly Color Maps for R. R package version 0.6.1.
+
+  Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal 10
+  (1), 439-446, https://doi.org/10.32614/RJ-2018-009
+  
+    Erich Neuwirth (2014). RColorBrewer: ColorBrewer Palettes. R package version 1.1-2.
+  https://CRAN.R-project.org/package=RColorBrewer
+  
+    Roger Bivand and Colin Rundel (2020). rgeos: Interface to Geometry Engine - Open Source ('GEOS'). R
+  package version 0.5-5. https://CRAN.R-project.org/package=rgeos
+  
+    Jeroen Ooms (2021). gifski: Highest Quality GIF Encoder. R package version 1.4.3-1.
+  https://CRAN.R-project.org/package=gifski
+  
+    Hadley Wickham and Jennifer Bryan (2019). readxl: Read Excel Files. R package version 1.3.1.
+  https://CRAN.R-project.org/package=readxl
+  
+    Thomas Lin Pedersen and David Robinson (2020). gganimate: A Grammar of Animated Graphics. R package
+  version 1.0.7. https://CRAN.R-project.org/package=gganimate
+  
+    Kamil Slowikowski (2021). ggrepel: Automatically Position Non-Overlapping Text Labels with 'ggplot2'. R
+  package version 0.9.1. https://CRAN.R-project.org/package=ggrepel
+  
+    South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.
+    
+   Simon Urbanek (2019). jpeg: Read and write JPEG images. R package version 0.1-8.1.
+  https://CRAN.R-project.org/package=jpeg   
+  
 Forbes. (2021, April 19). Data is the new oil | Retrieved May 25, 2021, from https://medium.com/@adeolaadesina/data-is-the-new-oil-2947ed8804f6
 
