@@ -213,7 +213,8 @@ migrationusa <- ggplot() + worldmap +
             aes(x = base_long, y = base_lat, fill = Net_Migration), 
             col = "blue", 
             size = 1.5) +
-  labs(title = "Migration Pattern to USA from other countries")
+  labs(title = "Migration Pattern to USA from other countries") +
+  theme_bw()
 
 ggplotly(migrationusa)
 
@@ -243,7 +244,9 @@ talent <- talentmig_industry_summary %>%
   coord_flip() +
   labs(title = "Industry Migration trend from 2015-2019",
            y = "Industry",
-           x = "Year")
+           x = "Year") +
+  theme_bw() +
+  theme(axis.text.y=element_text(size = rel(0.75), margin = margin(1, unit = "cm"),vjust =1))
 
 ggplotly(talent)
 
@@ -268,7 +271,14 @@ g <- talentmig_skill_summary %>%
   mutate(Year=as.factor(Year)) %>% 
   ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
   geom_col() + labs(y="Skills", x = "Year") +
-  facet_wrap(~skill_group_category, ncol = 5)
+  facet_wrap(~skill_group_category, ncol = 5) +
+  theme_bw() + 
+  theme(
+  axis.title.x = element_text(size = 10, face = "bold"),
+  axis.title.y = element_text(size = 10, face = "bold"),
+  axis.text.x = element_text(size = 8)) +
+  guides(fill=guide_legend("Skill Name"))
+
 fig <- ggplotly(g)
 fig
 
@@ -314,13 +324,11 @@ talentmig_country %>%
 - Top countries with people *migrating from*, in search of jobs belong to *Sub-Saharan African continent*.
 - It is observed that *USA has maximum number of immigrants from Europe and and Africa* in the year 2019
 - Industries like *Finance* - __Venture Capital and Private Equity__, *Tech Sector* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals from other industries. *E-Learning* and *Outsourcing/Offshoring* is an upcoming industry with increasing arrivals.
-- In *Business Skill sector*, maximum arrivals are in __Debt Collection skill__
-- In *Disruptive Tech Skill sector*, maximum and consistent arrivals are in __Fintech sector__. Also __Aerospace Engineering__ showing a consistent trend of departures
--In *Soft Skill sector*, __Persuasion skills__ have shown consistency with maximum arrivals. These skills are the need of the hour with increasing sales and marketing trend. 
-- *Specialised Industry* sector shows an upcoming trend in skills like __Nuclear Physics, Oral Comprehension & Psychiatry__
-- *Tech Skills sector* shows a consistent trend for __Data-Driven Analytics__, with __Web hosting__ being next in line. 
-
-
+- In *Business Skill category*, maximum arrivals are in __Debt Collection skill__
+- In *Disruptive Tech Skill category*, maximum and consistent arrivals are in __Fintech sector__. Also __Aerospace Engineering__ showing a consistent trend of departures
+-In *Soft Skill category*, __Persuasion skills__ have shown consistency with maximum arrivals. These skills are the need of the hour with increasing sales and marketing trend. 
+- *Specialised Industry* category shows an upcoming trend in skills like __Nuclear Physics, Oral Comprehension & Psychiatry__
+- *Tech Skills category* shows a consistent trend for __Data-Driven Analytics__, with __Web hosting__ being next in line. 
 
 
 
