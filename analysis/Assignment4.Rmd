@@ -228,7 +228,7 @@ ggplotly(talent)
 ```
 
 
-### Skill Gain across verticals from the year 2015-2019
+### Skill Gain due to migration from the year 2015-2019
 
 ```{r}
 
@@ -248,7 +248,7 @@ g <- talentmig_skill_summary %>%
   ungroup() %>% 
   mutate(Year=as.factor(Year)) %>% 
   ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
-  geom_bar(stat = 'identity', position = "stack") + 
+  geom_bar(stat = 'identity', position = "stack") +
   labs(y="Skill Gain", x = "Year") +
   facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
   theme_bw(base_size = 12) + 
@@ -269,27 +269,27 @@ fig
 ```
 
 
-### Skill Loss across verticals from the year 2015-2019
+### Skill Loss due to migration from the year 2015-2019
 
 ```{r}
 
 
 talentmig_skill_summary_1 <- talentmig_skill %>% 
   group_by(skill_group_name, skill_group_category, Year) %>% 
-  summarise(netmigration = mean(Net_Migration)) %>% 
-  arrange(netmigration) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>%
   na.omit(skill_group_name)
 
 
 q <- talentmig_skill_summary %>%
   filter(netmigration < 0) %>% 
-  group_by(skill_group_category) %>% 
+  group_by(skill_group_category) %>%
+  arrange(desc(netmigration)) %>% 
   top_n(10) %>% 
-  ungroup() %>% 
   mutate(Year=as.factor(Year)) %>% 
   ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
   geom_bar(stat = 'identity', position = "stack") +
   labs(y="Skill Loss", x = "Year") +
+  scale_y_reverse() +
   facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
   theme_bw(base_size = 12) + 
    theme(strip.text = element_text(size = 11, colour = "black"),
@@ -372,12 +372,28 @@ talentmig_country %>%
 
 - Top 3 out 10 countries with the highest number of *net migrant arrivals* are from the __European region__ and this can be correlated to the high employment growth rate of *Luxembourg, Cyprus and Georgia*. 
 - Top countries with people *migrating from*, in search of jobs belong to __Sub-Saharan African continent__.
-- Industries like *Finance* - __Venture Capital and Private Equity__ and *Tech Industry* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals from other industries. _E-Learning_ and _Outsourcing/Offshoring_ is an upcoming industry with increasing arrivals.
-- In *Business Skill category*, __Debt Collection skill__ has seen maximum skill *gain*, whereas __Investor Relations, Tax Accounting and Partner Development__ has seen maximum skill *loss*
-- In *Disruptive Tech Skill category*, __Fintech sector__ has seen maximum skill *gain*, whereas __Aerospace Engineering and Material Science__ has seen maximum skill *loss*
-- In *Soft Skill category*, __Persuasion skills__ has seen maximum skill *gain* with __Communication__ showing a continuous downward trend
-- *Specialised Industry* category shows an upward trend in skills related to sciences
-- *Tech Skills category* shows a consistent upward trend for __Data-Driven Analytics__ whereas __Computer Graphics and Social Media__ show downward trend 
+- Industries like *Finance* - __Venture Capital and Private Equity__ and *Tech Industry* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals due to migration. __E-Learning__ and __Outsourcing/Offshoring__ is an upcoming industry with increasing arrivals.
+
+
+__Top Skill Gains due to migration__
+
+- Debt Collection skill - Shows an upward trend 
+- Fintech 
+- Persuasion skills
+- Data-Driven Analytics
+- Nanotechnology
+- Nuclear Physics
+- Web Hosting
+
+__Maximum Skill Loss due to migration__
+
+- Investor Relations & Partner Development
+- Aerospace Engineering
+- Material Science
+- Time Management
+- Communication
+- Paediatrics
+- Computer Graphics and Social Media
 
 
 
@@ -552,7 +568,7 @@ Professionals in today's day and time are always looking for opportunities to gr
 
 Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
 
-As one upskills, they find it harder to stay stationary within their old environment and migrate to greener pastures. Migration in certain hard skills like Data Driven Analytics, Fintech and soft skills like Persuasion has seen an upward trend. This can be credited to expanding technology and the growing stock market and startup culture looking at the Venture Capital and Private Equity industry trend.
+As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics, Fintech, Nanotechnology and soft skills like Persuasion has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology and the growing stock markets and startup culture looking at the Venture Capital and Private Equity industry trend.
 
 However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. 
 
