@@ -53,7 +53,7 @@ The final aspect but supremely important one is whether the global employment tr
 The World Bank Group - Linkedin Digital Data for Development attempts to harness LinkedIn data covering more than 100 countries. For the purpose of this report the following datasets will be accessed:
 
 - Excel: Industry Skills Needs
-- 
+- Excel: Talent Migration
 - 
 
 
@@ -220,32 +220,60 @@ ggplotly(migrationusa)
 ```
 
 
-
-### Top Skills in demand in 2019
+### Industry migration trend from the year 2015-2019
 
 ```{r}
 
-talentmig_skill <- read.csv("../clean_data/talent_migration_skill.csv")
+talentmig_industry <- read.csv("../clean_data/talent_migration_industry.csv")
 
-talent_mig_plot <- talentmig_skill %>% 
-  group_by(skill_group_name) %>% 
+talentmig_industry_summary <- talentmig_industry %>% 
+  group_by(industry_name, Year) %>% 
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(desc(netmigration)) %>% 
-  head(20) %>% 
-  ggplot(., aes(x=skill_group_name, y=netmigration)) + 
-  geom_bar(stat='identity', fill="steelblue") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  na.omit(industry_name)
 
-talent_mig_plot
+talent <- talentmig_industry_summary %>% 
+  group_by(Year) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x=industry_name, y = netmigration, fill = Year)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Year, scales = "free_y", ncol = 2)+
+  coord_flip() +
+  labs(title = "Industry Migration trend from 2015-2019",
+           y = "Industry",
+           x = "Year")
+
+ggplotly(talent)
 
 ```
 
 
-### Analysis
+### Skill migration trend from the year 2015-2019
 
-- It is observed that the top 3 out 10 countries with the highest number of net migrant arrivals are from the European region
-- We can observe that the top countries with people migrating from in search of jobs belong to Sub-Saharan African continent.
-- It is observed that USA has maximum number of immigrants from Europe and and Africa in the year 2019
+```{r}
+
+talentmig_skill <- read_csv("../clean_data/talent_migration_skill.csv")
+
+talentmig_skill_summary <- talentmig_skill %>% 
+  group_by(skill_group_name, skill_group_category, Year) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  na.omit(skill_group_name)
+g <- talentmig_skill_summary %>%
+  group_by(skill_group_category) %>% 
+  top_n(20) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
+  geom_col() + labs(y="Skills", x = "Year") +
+  facet_wrap(~skill_group_category, ncol = 5)
+fig <- ggplotly(g)
+fig
+
+```
+
 
 
 
@@ -279,6 +307,18 @@ talentmig_country %>%
   kable_styling("striped","hover", font_size = 15)
   
 ```
+
+### Analysis
+
+- Top 3 out 10 countries with the highest number of *net migrant arrivals* are from the *European region*
+- Top countries with people *migrating from*, in search of jobs belong to *Sub-Saharan African continent*.
+- It is observed that *USA has maximum number of immigrants from Europe and and Africa* in the year 2019
+- Industries like *Finance* - __Venture Capital and Private Equity__, *Tech Sector* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals from other industries. *E-Learning* and *Outsourcing/Offshoring* is an upcoming industry with increasing arrivals.
+- In *Business Skill sector*, maximum arrivals are in __Debt Collection skill__
+- In *Disruptive Tech Skill sector*, maximum and consistent arrivals are in __Fintech sector__. Also __Aerospace Engineering__ showing a consistent trend of departures
+-In *Soft Skill sector*, __Persuasion skills__ have shown consistency with maximum arrivals. These skills are the need of the hour with increasing sales and marketing trend. 
+- *Specialised Industry* sector shows an upcoming trend in skills like __Nuclear Physics, Oral Comprehension & Psychiatry__
+- *Tech Skills sector* shows a consistent trend for __Data-Driven Analytics__, with __Web hosting__ being next in line. 
 
 
 
@@ -469,6 +509,6 @@ World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 202
 
 World Bank. (n.d.). Employment Growth | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/employment-growth-linkedin-data
 
+World Bank. (n.d.). Migration | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/talent-migration-linkedin-data
+
 Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
-
-
