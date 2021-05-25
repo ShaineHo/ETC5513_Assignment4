@@ -196,6 +196,31 @@ Talent Migration {.tabset}
 Column {data-width=700}
 ---------------------------------------------------
 
+### Migration Pattern to USA from other countries
+
+```{r}
+
+talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
+
+talent_usa <- talentmig_country %>% 
+  filter(target_country_name == "United States") %>% 
+  filter(Net_Migration < 0)
+
+worldmap <- borders("world", colour="#ebc26c", fill="#ebc26c")
+
+migrationusa <- ggplot() + worldmap + 
+ geom_point(data=talent_usa, 
+            aes(x = base_long, y = base_lat, fill = Net_Migration), 
+            col = "blue", 
+            size = 1.5) +
+  labs(title = "Migration Pattern to USA from other countries") +
+  theme_bw()
+
+ggplotly(migrationusa)
+
+```
+
+
 ### Industry migration trend from the year 2015-2019
 
 ```{r}
@@ -214,21 +239,21 @@ talent <- talentmig_industry_summary %>%
   ungroup() %>% 
   mutate(Year=as.factor(Year)) %>% 
   ggplot(aes(x=industry_name, y = netmigration, fill = Year)) +
-  geom_col() +
+  geom_col(show.legend = FALSE) +
   facet_wrap(~Year, scales = "free_y", ncol = 2)+
   coord_flip() +
-  labs(y = "Industry",
+  labs(title = "Industry Migration trend from 2015-2019",
+           y = "Industry",
            x = "Year") +
   theme_bw() +
-  theme(axis.text.y=element_text(size = rel(0.75), margin = margin(1, unit = "cm"),vjust =1),
-        legend.position = "none")
+  theme(axis.text.y=element_text(size = rel(0.75), margin = margin(1, unit = "cm"),vjust =1))
 
 ggplotly(talent)
 
 ```
 
 
-### Skill Gain across verticals from the year 2015-2019
+### Skill migration trend from the year 2015-2019
 
 ```{r}
 
@@ -239,72 +264,23 @@ talentmig_skill_summary <- talentmig_skill %>%
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(desc(netmigration)) %>% 
   na.omit(skill_group_name)
-
-
 g <- talentmig_skill_summary %>%
-  filter(netmigration > 0) %>% 
   group_by(skill_group_category) %>% 
-  top_n(10) %>% 
+  top_n(20) %>% 
   ungroup() %>% 
   mutate(Year=as.factor(Year)) %>% 
   ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
-  geom_bar(stat = 'identity', position = "stack") + 
-  labs(y="Skill Gain", x = "Year") +
-  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
-  theme_bw(base_size = 12) + 
-   theme(strip.text = element_text(size = 11, colour = "black"),
-         strip.background = element_blank(),
-         axis.text.y = element_blank(),
-         axis.text.x = element_text(size=6,hjust = -1),
-         plot.background = element_rect(fill = "transparent", colour = NA),
-         panel.border = element_blank(),
-         axis.ticks = element_blank(),
-    aspect.ratio = 1) +
-  guides(fill=guide_legend("Skill Name")
-         )
+  geom_col() + labs(y="Skills", x = "Year") +
+  facet_wrap(~skill_group_category, ncol = 5) +
+  theme_bw() + 
+  theme(
+  axis.title.x = element_text(size = 10, face = "bold"),
+  axis.title.y = element_text(size = 10, face = "bold"),
+  axis.text.x = element_text(size = 8)) +
+  guides(fill=guide_legend("Skill Name"))
 
 fig <- ggplotly(g)
 fig
-
-```
-
-
-### Skill Loss across verticals from the year 2015-2019
-
-```{r}
-
-
-talentmig_skill_summary_1 <- talentmig_skill %>% 
-  group_by(skill_group_name, skill_group_category, Year) %>% 
-  summarise(netmigration = mean(Net_Migration)) %>% 
-  arrange(netmigration) %>% 
-  na.omit(skill_group_name)
-
-
-q <- talentmig_skill_summary %>%
-  filter(netmigration < 0) %>% 
-  group_by(skill_group_category) %>% 
-  top_n(10) %>% 
-  ungroup() %>% 
-  mutate(Year=as.factor(Year)) %>% 
-  ggplot(aes(x = Year, y = netmigration, fill = skill_group_name)) +
-  geom_bar(stat = 'identity', position = "stack") +
-  labs(y="Skill Loss", x = "Year") +
-  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
-  theme_bw(base_size = 12) + 
-   theme(strip.text = element_text(size = 11, colour = "black"),
-         strip.background = element_blank(),
-         axis.text.y = element_blank(),
-         axis.text.x = element_text(size=6,hjust = -1),
-         plot.background = element_rect(fill = "transparent", colour = NA),
-         panel.border = element_blank(),
-         axis.ticks = element_blank(),
-    aspect.ratio = 1) +
-  guides(fill=guide_legend("Skill Name")
-         )
-
-fig1 <- ggplotly(q)
-fig1
 
 ```
 
@@ -313,45 +289,6 @@ fig1
 
 Column {data-width=300}
 ---------------------------------------------------
-
-### Top 10 countries with Highest Number of Immigrants
-
-```{r}
-
-talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
-
-talentmig_country %>% 
-  filter(Year == "2019") %>% 
-  group_by(base_country_name) %>% 
-  summarise(netmigration = mean(Net_Migration)) %>% 
-  arrange(desc(netmigration)) %>% 
-  head(10) %>% 
-  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
-  kable_styling("striped","hover", font_size = 12)
-  
-```
-
-### Top 5 Employment Growth (Countries)
-
-```{r}
-
-emp_growth_1 <- read_csv("../clean_data/emp_growth.csv")
-
-emp_growth_long_1 <- emp_growth_1 %>% 
-  pivot_longer(cols = c("2015":"2019"), names_to = "year", values_to = "growth_rate") 
-
-
-emp_growth_long_1 %>% 
-  select(country_name, wb_region, year, growth_rate) %>% 
-  group_by(country_name, wb_region) %>% 
-  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
-  arrange(desc(avg_growth_pct)) %>% 
-  head(5) %>% 
-  kable(align = "c", col.names = c("country name", "region", "average perentage of growth")) %>% 
-  kable_styling("striped","hover", font_size = 12)
-  
-```
-
 
 ### Highest Migration Rate
 
@@ -363,10 +300,23 @@ talentmig_country %>%
   arrange(netmigration) %>% 
   head(10) %>% 
   kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
-  kable_styling("striped","hover", font_size = 12)
+  kable_styling("striped","hover", font_size = 15)
   
 ```
 
+### Top 10 countries with Highest Number of Immigrants
+
+```{r}
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  head(10) %>% 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 15)
+  
+```
 
 ### Analysis
 
