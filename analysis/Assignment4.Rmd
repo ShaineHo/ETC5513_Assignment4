@@ -543,10 +543,12 @@ emp_growth_long %>%
 Conclusion {.tabset}
 ====================
 
+
 Column
 -------------------------------------------------------
 
-#### Conclusion
+
+### Conclusion
 
 Professionals in today's day and time are always looking for opportunities to grow in terms of their career. There are multiple aspects to this growth and the environment needed to enrich the growth.
 
@@ -554,11 +556,11 @@ Skills are front and center in terms of must-haves for a fruitful career. From t
 
 As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics, Fintech, Nanotechnology and soft skills like Persuasion has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology and the growing stock markets and startup culture looking at the Venture Capital and Private Equity industry trend.
 
-However we also need to consider whether the current economy is at the state where such activities are possibly and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
+However we also need to consider whether the current economy is at the state where such activities are possible and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
 
-------------------------------------------------------------------
 
-#### Thank You and hope you can all get a good job in the future
+
+### Thank You and hope you can all get a good job in the future
 
 ```{r fig2, echo=FALSE, fig.cap=" ", out.width = " "}
 knitr::include_graphics("meme1.jpg")
