@@ -1,5 +1,5 @@
 ---
-title: "Research Topic"
+title: "Analysis of Employment Trends"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -24,31 +24,42 @@ library(tibble)
 library(ggplot2)
 library(ggrepel)
 library(rworldmap)
-
+library(jpeg)
 ```
 
 Introduction {.tabset}
 ======================
 
-Column {data-width=700}
+Column {data-width=600}
 -----------------------------------------------------------------------
 
-### Chart A
+### Background
 
-```{r}
+LinkedIn is an illustrious website that helps professionals connect with one another. It is also a portal for people to display their skills as well as the path that their career has taken through the years. It contains a variety of information ranging from education, knowledge to checkpoints in their career.
 
-```
+Employers also use this platform for recruiting professionals. So it is a useful tool which is slowly becoming a necessity for people entering into the corporate world. Navigation and understanding crucial skills for their profession of choice and the location they would flourish goes a long way in crafting a successful career.
+
+### Approach of Project
+
+The report will be charting the trends in LinkedIn across all fields. It will be delving into the kind of skills that are gaining or losing popularity across different verticals as well as what the top few must have skills are for all working professionals.
+
+The other useful component for young professionals is what the migration trends are with respect to their skills and which place would give them space to learn and display their potential.
+
+The final aspect but supremely important one is whether the global employment trends are conducive to their growth. Only upon knowing this aspect is it possible for them to decide whether migration is a good option or upskilling is necessary.
 
 
+### Information on Data
 
-Column {data-width=300}
+The World Bank Group - Linkedin Digital Data for Development attempts to harness LinkedIn data covering more than 100 countries. For the purpose of this report the following datasets will be accessed:
+
+- Excel: Industry Skills Needs
+- Excel: Talent Migration
+- 
+
+
+Column {data-width=400}
 -----------------------------------------------------------------------
 
-### Chart B
-
-```{r}
-
-```
 
 ### Group info
 
@@ -59,6 +70,13 @@ Column {data-width=300}
 - *Ambalika Gupta*
 - *Smriti Vinayak Bhat*
 - *Yin Shan Ho*
+
+### .
+
+
+```{r fig, echo=FALSE, fig.cap=" ", out.width = " "}
+knitr::include_graphics("meme1.jpg")
+```
 
 Skills {.tabset} 
 ======================
@@ -116,7 +134,7 @@ p <- skill_categ_trend %>%
 
 
 
-Column{.tabset}
+Column {data-width=500}
 --------------------------
 
 ### Trend in change of useful skills across occupations
@@ -470,14 +488,20 @@ emp_growth_long %>%
 
 
 
+Conclusion {.tabset}
+====================
+
 
 
 References {.tabset}
 ======================
 
+World Bank Group - LinkedIn. (n.d.). World Bank LinkedIn Digital Data for Development. Industry Jobs and Skills Trends. Retrieved May 25, 2021, from https://linkedindata.worldbank.org
+
 World Bank. (n.d.). Skills | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/skills-linkedin-data
 
 World Bank. (n.d.). Employment Growth | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/employment-growth-linkedin-data
 
-Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
+World Bank. (n.d.). Migration | LinkedIn Data | Data Catalog. Retrieved May 17, 2021, from https://datacatalog.worldbank.org/dataset/talent-migration-linkedin-data
 
+Agarrwal, K. (2021, April 19). What is FINTECH? Retrieved May 18, 2021, from https://www.forbes.com/advisor/in/banking/what-is-fintech/
