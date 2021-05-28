@@ -169,7 +169,7 @@ plot_ly(tech_trend) %>%
 - _Specialized industry skills_ seem to have seen volatility as they were **in decline up until 2017-2018** but with the **arrival of 2019 they saw a significant boost in demand**.
 - _Disruptive technological skills_ **do not seem to have caught on** yet except for the Information and Communication segment.
 - _Mining and Quarrying_ have seen **no disruptive tech skills growth** whatsoever.
-- Despite fintech^[@fintech] sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
+- Despite fintech sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
 
 ```{r}
 skills <- unique(tech_trend$skill_group_name)
@@ -270,7 +270,21 @@ Column {data-width=600}
 talentmig_country_summary <- talentmig_country %>% 
   select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
   group_by(base_country_name, Year) %>% 
-  summarise(netmigration = mean(Net_Migration))
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  mutate(base_country_name = recode(base_country_name,
+                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
+                             "Dominican Republic" = "Dominica" ,
+                             `Egypt, Arab Rep.` = "Egypt" ,
+                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
+                             `Iran, Islamic Rep.` = "Iran",
+                             `Korea, Rep.` = "	South Korea",
+                             "United States" = "United States of America",
+                             "Tanzania" = "United Republic of Tanzania",
+                          "Taiwan, China" = "Taiwan",
+                          "Venezuela, RB" = "Venezuela",
+                          `Yemen, Rep.` = "Yemen"  ,
+                          "Serbia" = "Republic of Serbia"  ))
+
 
 Countryjoin <- ne_countries(returnclass = "sf", scale = "medium") %>%
   select(admin) %>% 
@@ -293,40 +307,81 @@ animate(countrytalent, duration = 10, fps = 5, width = 1000, height = 500, rende
   
 ```
 
-### Top Skill Gains in the year 2019
 
-```{r}
 
-talentmig_skill_summary_1 <- talentmig_skill %>% 
+### Top Skill Gains in Tech
+
+```{r tech, fig.cap="Top 5 Skill gains in Tech Industry from 2015-2019"}
+
+talentmig_skill_summary <- talentmig_skill %>% 
   group_by(skill_group_name, skill_group_category, Year) %>% 
   summarise(netmigration = mean(Net_Migration)) %>%
   na.omit(skill_group_name)
 
-talentmig_skill_summary_11 <- talentmig_skill_summary_1 %>% 
-  filter(Year %in% "2019", netmigration > 0) %>% 
-  group_by(skill_group_category) %>%
-  slice_max(netmigration, n = 5)
 
-treemap(talentmig_skill_summary_11, index=c("skill_group_category","skill_group_name"),  vSize="netmigration", type="index",
-    fontsize.labels=c(15,12),                # size of labels. Give the size per level of aggregation: size for group, size for subgroup, sub-subgroups...
-    fontcolor.labels=c("black","black"),    # Color of labels
-    fontface.labels=c(2,1),                  # Font of labels: 1,2,3,4 for normal, bold, italic, bold-italic...
-    bg.labels=c("transparent"),              # Background color of labels
-    align.labels=list(
-        c("center", "top"), 
-        c("right", "bottom")
-        ),                                   # Where to place labels in the rectangle?
-    overlap.labels=1,                      # number between 0 and 1 that determines the tolerance of the overlap between labels. 0 means that labels of lower levels are not printed if higher level labels overlap, 1  means that labels are always printed. In-between values, for instance the default value .5, means that lower level labels are printed if other labels do not overlap with more than .5  times their area size.
-    inflate.labels=F,                        # If true, labels are bigger when rectangle is bigger.
-)
+ggsl <- talentmig_skill_summary %>%
+  filter(netmigration > 0, skill_group_category == "Tech Skills") %>% 
+  group_by(Year) %>% 
+  arrange(desc(netmigration)) %>% 
+  slice_max(netmigration,n = 5) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, color = skill_group_name)) +
+  geom_line(aes(group = skill_group_name )) +
+  geom_point() +
+  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
+  theme_bw(base_size = 12) + 
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+         axis.ticks = element_blank(),
+    aspect.ratio = 1) +
+  labs(title = "Skill Gain trend in Tech Industry", x = "Year", y = "Net Migration", colour = "Skill Name"
+  ) 
+
+ggplotly(ggsl)
+
 ```
+
+### Top Skill Gains in Tech
+
+```{r business, fig.cap="Top 5 Skill gains in Business Industry from 2015-2019"}
+
+ggsg2 <- talentmig_skill_summary %>%
+  filter(netmigration > 0, skill_group_category == "Business Skills") %>% 
+  group_by(Year) %>% 
+  slice_max(netmigration,n = 5) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, color = skill_group_name)) +
+  geom_line(aes(group = skill_group_name )) +
+  geom_point() +
+  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
+  theme_bw(base_size = 12) + 
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+         axis.ticks = element_blank(),
+    aspect.ratio = 1) +
+  labs(title = "Skill Gain trend in Business Industry", x = "Year", y = "Net Migration", colour = "Skill Name"
+  ) 
+
+ggplotly(ggsg2)
+```
+
 
 
 
 Column {data-width=200}
 ---------------------------------------------------
 
-### Top country gains for each Industry
+### Top Country Hub for each Industry
 
 ```{r}
 talentmig_industry_country <- talentmig_industry %>% 
@@ -340,14 +395,6 @@ talentmig_industry_country <- talentmig_industry %>%
 talentmig_industry_country
 
 ```
-
-
-### Analysis
-
-- Top 3 out 10 countries with the highest number of *net migrant arrivals* are from the __European region__ and this can be correlated to the high employment growth rate of *Luxembourg, Cyprus and Georgia*. 
-- Top countries with people *migrating from*, in search of jobs belong to __Sub-Saharan African continent__.
-- Industries like *Finance* - __Venture Capital and Private Equity__ and *Tech Industry* - __Computer and Network Security, Information Services, Internet__ have flourished consistently over the years with highest number of arrivals due to migration. __E-Learning__ and __Outsourcing/Offshoring__ is an upcoming industry with increasing arrivals.
-
 
 
 

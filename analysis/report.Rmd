@@ -67,6 +67,8 @@ The final aspect but supremely important one is whether the global employment tr
 
 - Which skills are gaining or losing popularity according to the data in each vertical?
 - Which are the top few must have skills for all working professionals across the years?
+- Global talent migration trend from 2015 - 2019
+- Which skills have highest net migration in Business and Tech Sector?
 
 # Methodology
 
@@ -85,7 +87,7 @@ skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.x
 - The data of the top 10 skills being utilized within each of these industries is present.
 - These skills are grouped by the number of skills for each category used within industry for each isic section.
 - This gives us a split of the occurrence of the skill group for each section per year.
-- This split is then represented using an animated rose chart for overall comparison as we do not require a quantitave comparison of exact number in this trend.
+ This split is then represented using an animated rose chart for overall comparison as we do not require a quantitative comparison of exact number in this trend.
 
 ```{r}
 skill_categ_trend <- skills_dataset %>%
@@ -161,8 +163,8 @@ plot_ly(tech_trend) %>%
 
 ## Talent Migration
 
-#### Global Migration Trends
-
+It is observed the most likely to emigrate are high-skilled workers, in particular those with management, research, and leadership skills. 
+LinkedIn best tracks  migrations between high-income countries, probably because economic migration of skilled workers makes up a larger share of the migration between those countries than between low-income countries, where it is more likely that migration is forced.
 
 ```{r include=FALSE}
 
@@ -171,19 +173,31 @@ talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
 talentmig_skill <- read_csv("../clean_data/talent_migration_skill.csv")
 
 
-
-talentmig_country <- subset(talentmig_country, select = -1)
-
 ```
 
 
-#### Global Migration Trend
+### Global Talent Migration Trend for Skilled Worker Migration 
 
-```{r}
+In order to analyze the annual net migration globally, we have referred to the country sheet of talent migration, assessing average net migration for each base country from the year 2015-2019, generating  \@ref(fig:globalmap) 
+
+```{r globalmap, fig.cap= "Global Migration from 2015-2019"}
 talentmig_country_summary <- talentmig_country %>% 
   select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
   group_by(base_country_name, Year) %>% 
-  summarise(netmigration = mean(Net_Migration))
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  mutate(base_country_name = recode(base_country_name,
+                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
+                             "Dominican Republic" = "Dominica" ,
+                             `Egypt, Arab Rep.` = "Egypt" ,
+                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
+                             `Iran, Islamic Rep.` = "Iran",
+                             `Korea, Rep.` = "	South Korea",
+                             "United States" = "United States of America",
+                             "Tanzania" = "United Republic of Tanzania",
+                          "Taiwan, China" = "Taiwan",
+                          "Venezuela, RB" = "Venezuela",
+                          `Yemen, Rep.` = "Yemen"  ,
+                          "Serbia" = "Republic of Serbia"  ))
 
 Countryjoin <- ne_countries(returnclass = "sf", scale = "medium") %>%
   select(admin) %>% 
@@ -195,9 +209,12 @@ countrytalent  <- ggplot()+
   geom_sf(data = countries, fill = NA)+
   geom_sf(data = Countryjoin ,
           mapping = aes(fill = factor(sign(netmigration)))) +
- scale_colour_manual(values = c("firebrick", "dodgerblue4"),
-                     breaks = c("Emigration", "Immigration")) +
-  labs(title = "Global Migration",
+ scale_colour_manual(guide = FALSE,
+                     values = c("firebrick", "dodgerblue4"),
+                     name = "Net Migration",
+                     breaks = c("Emigration", "Immigration"),
+                     labels = c("Emigration", "Immigration")) +
+  labs(title = "Global Migration Trend from 2015-2019",
        subtitle = "Year: {current_frame}",
        fill = "Net Migration")+
   theme_bw()+
@@ -206,54 +223,133 @@ animate(countrytalent, duration = 10, fps = 5, width = 1000, height = 500, rende
   
 ```
 
-#### Top countries with highest emigration
 
-```{r}
+
+### Top countries with highest net talent emigration
+
+\@ref(tab:ctyemig) refers to the top 5 countries with highest average net migration for talented skilled workers. This has been calculated by grouping together base countries and calculating average net migration from the period 2015-2019. 
+
+```{r ctyemig}
 
 talentmig_country %>% 
   filter(Year == "2019") %>% 
   group_by(base_country_name) %>% 
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(netmigration) %>% 
-  head(10) %>% 
-  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  head(5) %>% 
+  kable(caption = "Top 5 Countries with highest emigration", 
+        align = "c", col.names = c("Country Name", "Net Migration")) %>% 
   kable_styling("striped","hover", font_size = 12)
   
 ```
 
 
-#### Top 10 countries with highest immigration
 
-```{r}
+### Top 5 countries with highest net talent immigration
 
+\@ref(tab:ctyimmig) refers to the top 5 countries with highest average immigration for talented skilled workers. This has been calculated by grouping together base countries and calculating average net immigration from the period 2015-2019. 
 
+```{r ctyimmig}
 talentmig_country %>% 
   filter(Year == "2019") %>% 
   group_by(base_country_name) %>% 
   summarise(netmigration = mean(Net_Migration)) %>% 
   arrange(desc(netmigration)) %>% 
-  head(10) %>% 
-  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  head(5) %>% 
+  kable(caption = "Top 10 Countries with highest immigration",
+    align = "c", col.names = c("Country Name", "Net Migration")) %>% 
   kable_styling("striped","hover", font_size = 12)
   
 ```
 
+### Industrial Trend
 
-#### Top country gains for each Industry
+\@ref(tab:industry) has been built to find the country with maximum gains in terms of skilled worker for each industry. It has been calculated using the average migration from the period 2015-2019 for each industry and picked out the top ranking country in terms of net migration.
 
-```{r}
+```{r industry}
 talentmig_industry_country <- talentmig_industry %>% 
   group_by(isic_section_name, country_name) %>%
   summarise(netmigration = mean(Net_Migration)) %>%
   slice_max(netmigration, n = 1) %>% 
   select(isic_section_name, country_name) %>% 
-  kable(align = "c", col.names = c("Industry Name", "Country Name")) %>% 
+  kable( caption = "Top Country Hub for Different Industries",
+    align = "c", col.names = c("Industry Name", "Country Name")) %>% 
   kable_styling("striped","hover", font_size = 12)
 
 talentmig_industry_country
 
 ```
 
+
+
+### Skill Gain Trend 2015-2019 
+
+Most high-skilled workers, in particular those with management, research, and leadership skills, choose to migrate into a skill with lucrative opportunities and growth. In Figures \@ref(fig:tech) and \@ref(fig:business) we observe the top 5 skill gains of Tech industry and Business Industry.
+
+
+```{r tech, fig.cap="Top 5 Skill gains in Tech Industry from 2015-2019"}
+
+talentmig_skill_summary <- talentmig_skill %>% 
+  group_by(skill_group_name, skill_group_category, Year) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>%
+  na.omit(skill_group_name)
+
+
+ggsl <- talentmig_skill_summary %>%
+  filter(netmigration > 0, skill_group_category == "Tech Skills") %>% 
+  group_by(Year) %>% 
+  arrange(desc(netmigration)) %>% 
+  slice_max(netmigration,n = 5) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, color = skill_group_name)) +
+  geom_line(aes(group = skill_group_name )) +
+  geom_point() +
+  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
+  theme_bw(base_size = 12) + 
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+         axis.ticks = element_blank(),
+    aspect.ratio = 1) +
+  labs(title = "Skill Gain trend in Tech Industry", x = "Year", y = "Net Migration", colour = "Skill Name"
+  ) 
+
+ggplotly(ggsl)
+
+```
+
+
+
+```{r business, fig.cap="Top 5 Skill gains in Business Industry from 2015-2019"}
+
+ggsg2 <- talentmig_skill_summary %>%
+  filter(netmigration > 0, skill_group_category == "Business Skills") %>% 
+  group_by(Year) %>% 
+  slice_max(netmigration,n = 5) %>% 
+  ungroup() %>% 
+  mutate(Year=as.factor(Year)) %>% 
+  ggplot(aes(x = Year, y = netmigration, color = skill_group_name)) +
+  geom_line(aes(group = skill_group_name )) +
+  geom_point() +
+  facet_wrap(~skill_group_category, ncol = 5, labeller = labeller(skill_group_category = label_wrap_gen(20)), scales = "free") +
+  theme_bw(base_size = 12) + 
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+         axis.ticks = element_blank(),
+    aspect.ratio = 1) +
+  labs(title = "Skill Gain trend in Business Industry", x = "Year", y = "Net Migration", colour = "Skill Name"
+  ) 
+
+ggplotly(ggsg2)
+```
 
 
 
@@ -310,6 +406,32 @@ skills_data %>%
 - Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 
+## Global Talent Migration Trend from 2015-2019
+
+- The __Middle East and North Africa, Latin America and the Caribbean, and South Asia__ have seen the greatest talent loss in recent years, whereas __UAE__ in addition to Organization for Economic Cooperation and Development (OECD) countries such as __USA, Canada, Australia, New Zealand and Europe__ are attracting the most talent.
+- __Latin American countries like Cuba, Jamaica and Haiti__ have the highest net emigration. Which can be due to poor quality jobs and falling real wages.
+- __European countries like Luxembourg, Georgia and Cyprus__ have the highest net Immigration.
+- __Qatar__ and __Kuwait__ are observed to be top countries for energy industries
+- __Luxembourg__ is observed to be the hotspot for most industries for highest gains in terms of skilled worker migration. __Luxembourg__ is considered to be the economic powerhouse of the Greater Region and the financial hotspot on the European continent. Luxembourg's thriving economy is a major argument for many foreign nationals to live in the country. The country's health insurance and social security systems, its high quality infrastructures and the government's support for families has led to one of the world's highest quality of life standards. Multilingual environment: When so many people from all parts of the world come together, communication is key. Luxembourg's population has always been multilingual, making it easy for foreigners to take part in an open and welcoming society ^[@luxembourg]
+
+## Skill Gain due to Migration
+
+__Top Skill Gains in 2019 due to migration__
+
+*Tech* <br>
+- Data-Driven Analytics <br>
+- Web Hosting - Upcoming skills with Cloud computing trend <br>
+- Game Development <br>
+- Computer Graphics <br>
+- Signal Processing <br>
+
+*Business* <br>
+- Debt Collection <br>
+- Competitive Strategies <br>
+- Customer Service Systems <br>
+- Affiliate Marketing - Upcoming skills like Amway, ClixGalore <br>
+- Tax Accounting and Bookkeeping - Traditional professions have shown a downward trend <br>
+
 
 # Conclusions
 
@@ -317,7 +439,7 @@ Professionals in today's day and time are always looking for opportunities to gr
 
 Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
 
-As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics, Fintech, Nanotechnology and soft skills like Persuasion has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology and the growing stock markets and startup culture looking at the Venture Capital and Private Equity industry trend.
+As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics and Web Hosting has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology. Business Skills like Competitive Strategies and Affiliate marketing are new age era skills that have a potential market.
 
 However we also need to consider whether the current economy is at the state where such activities are possible and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
 
