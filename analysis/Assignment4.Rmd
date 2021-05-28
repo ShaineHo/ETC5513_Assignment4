@@ -169,7 +169,7 @@ plot_ly(tech_trend) %>%
 - _Specialized industry skills_ seem to have seen volatility as they were **in decline up until 2017-2018** but with the **arrival of 2019 they saw a significant boost in demand**.
 - _Disruptive technological skills_ **do not seem to have caught on** yet except for the Information and Communication segment.
 - _Mining and Quarrying_ have seen **no disruptive tech skills growth** whatsoever.
-- Despite fintech sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
+- Despite fintech^[@fintech] sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
 
 ```{r}
 skills <- unique(tech_trend$skill_group_name)
