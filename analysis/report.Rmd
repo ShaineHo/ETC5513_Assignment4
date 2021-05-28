@@ -69,6 +69,102 @@ The final aspect but supremely important one is whether the global employment tr
 
 ## Talent Migration
 
+#### Global Migration Trends
+
+
+```{r include=FALSE}
+
+talentmig_industry <- read.csv("../clean_data/talent_migration_industry.csv")
+talentmig_country <- read.csv("../clean_data/talent_migration_country.csv")
+talentmig_skill <- read_csv("../clean_data/talent_migration_skill.csv")
+
+
+
+talentmig_country <- subset(talentmig_country, select = -1)
+
+```
+
+
+#### Global Migration Trend
+
+```{r}
+talentmig_country_summary <- talentmig_country %>% 
+  select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
+  group_by(base_country_name, Year) %>% 
+  summarise(netmigration = mean(Net_Migration))
+
+Countryjoin <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin) %>% 
+  right_join(talentmig_country_summary, by = c("admin" = "base_country_name")) 
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+
+countrytalent  <- ggplot()+
+  geom_sf(data = countries, fill = NA)+
+  geom_sf(data = Countryjoin ,
+          mapping = aes(fill = factor(sign(netmigration)))) +
+ scale_colour_manual(values = c("firebrick", "dodgerblue4"),
+                     breaks = c("Emigration", "Immigration")) +
+  labs(title = "Global Migration",
+       subtitle = "Year: {current_frame}",
+       fill = "Net Migration")+
+  theme_bw()+
+  transition_manual(Year) 
+animate(countrytalent, duration = 10, fps = 5, width = 1000, height = 500, renderer = gifski_renderer())
+  
+```
+
+#### Top countries with highest emigration
+
+```{r}
+
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(netmigration) %>% 
+  head(10) %>% 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 12)
+  
+```
+
+
+#### Top 10 countries with highest immigration
+
+```{r}
+
+
+talentmig_country %>% 
+  filter(Year == "2019") %>% 
+  group_by(base_country_name) %>% 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  arrange(desc(netmigration)) %>% 
+  head(10) %>% 
+  kable(align = "c", col.names = c("Country Name", "Net Migration")) %>% 
+  kable_styling("striped","hover", font_size = 12)
+  
+```
+
+
+#### Top country gains for each Industry
+
+```{r}
+talentmig_industry_country <- talentmig_industry %>% 
+  group_by(isic_section_name, country_name) %>%
+  summarise(netmigration = mean(Net_Migration)) %>%
+  slice_max(netmigration, n = 1) %>% 
+  select(isic_section_name, country_name) %>% 
+  kable(align = "c", col.names = c("Industry Name", "Country Name")) %>% 
+  kable_styling("striped","hover", font_size = 12)
+
+talentmig_industry_country
+
+```
+
+
+
+
 ## Employment Growth
 
 
