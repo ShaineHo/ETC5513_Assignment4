@@ -4,13 +4,14 @@ author: "Smriti Vinayak Bhat, Yin Shan Ho, Ambalika Gupta"
 date: "28/05/2021"
 bibliography: references.bib
 output:
-  bookdown::pdf_document2:
+  bookdown::html_document2:
     fig_caption: yes
     fig_height: 5
     fig_width: 8
     number_sections: yes
     citation_package: biblatex
     toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -23,11 +24,11 @@ library(viridis)
 library(sf)
 library(RColorBrewer)
 library(rgeos)
-library(gifski)
 library(readxl)
 library(gganimate)
 library(ggrepel)
 library(rworldmap)
+library(bookdown)
 ```
 
 
@@ -49,6 +50,9 @@ The World Bank Group - Linkedin Digital Data for Development^[@linkedin] attempt
 - Excel: Talent Migration
 - Excel: Employment Growth
 
+## Scope of Data
+
+The above excel sheets will be utilized for charting trends based on industry skills, migration of talent across the globe and global employment growth statistics.
 
 # Rationale
 
@@ -56,16 +60,104 @@ The report will be charting the trends in LinkedIn across all fields. It will be
 
 The other useful component for young professionals is what the migration trends are with respect to their skills and which place would give them space to learn and display their potential.
 
-The final aspect but supremely important one is whether the global employment trends are conducive to their growth. Only upon knowing this aspect is it possible for them to decide whether migration is a good option or upskilling is 
+The final aspect but supremely important one is whether the global employment trends are conducive to their growth. Only upon knowing this aspect is it possible for them to decide whether migration is a good option or upskilling is necessary.
 
 
 # Research Questions
 
+- Which skills are gaining or losing popularity according to the data in each vertical?
+- Which are the top few must have skills for all working professionals across the years?
 
 # Methodology
 
 
 ## Skills
+
+### Trend of skill categories across the different verticals by year
+
+In order to analyse the different skill categories by vertical the excel sheet for industry skill needs has to be used. Upon importing this data the below steps must be taken to generate \@ref(fig:skills1):
+
+```{r read-data}
+skills_dataset <- readxl::read_excel("../data/public_use-industry-skills-needs.xlsx", sheet = "Industry Skills Needs")
+```
+
+- Here verticals refers to the different isic sections (within which multiple industries are coalesced)
+- The data of the top 10 skills being utilized within each of these industries is present.
+- These skills are grouped by the number of skills for each category used within industry for each isic section.
+- This gives us a split of the occurrence of the skill group for each section per year.
+- This split is then represented using an animated rose chart for overall comparison as we do not require a quantitave comparison of exact number in this trend.
+
+```{r}
+skill_categ_trend <- skills_dataset %>%
+  select(year, skill_group_category, isic_section_name) %>%
+  group_by(year,isic_section_name,skill_group_category) %>%
+  tally()
+
+skill_categ_trend$skill_group_category = str_wrap(skill_categ_trend$skill_group_category, width = 10)
+
+```
+
+```{r skills1, fig.cap="Trend of skill categories across the different verticals by year", out.width="70%"}
+
+cp <- coord_polar(theta='x',start=0,direction=-1)
+cp$is_free <- function() TRUE
+
+p <- skill_categ_trend %>%
+   ggplot(aes(x = skill_group_category, y = n, fill = skill_group_category)) +
+   geom_bar(stat = "identity", width = 1) +
+   facet_wrap(~isic_section_name,ncol = 3, labeller = labeller(isic_section_name = label_wrap_gen(30)), scales = "free") +
+   coord_flip() +
+   theme_bw(base_size = 12) +
+   theme(strip.text = element_text(size = 11, colour = "black"),
+         strip.background = element_blank(),
+         axis.title.y = element_blank(),
+         axis.title.x = element_blank(),
+         axis.text.y = element_blank(),
+         axis.text.x = element_text(size=6,hjust = -1),
+         axis.ticks = element_blank(),
+         plot.background = element_rect(fill = "transparent", colour = NA),
+         panel.border = element_blank(),
+    legend.position = 'none',
+    aspect.ratio = 1) +
+  cp
+
+ p <- p +
+   labs(title = 'Year: {round(frame_time)}') +
+   transition_time(year)
+ animate(p, height = 9, width = 7, units = "in", res = 150)
+ 
+```
+
+
+### Trend in change of useful skills across occupations
+
+In order to analyse the top 10 useful skills on LinkedIn by year, the excel sheet for industry skill needs has to be used. Upon importing this data the below steps must be taken to generate \@ref(fig:skills2):
+
+- The data set is grouped by year and skill_group_name variable (which gives the name of the skill)
+- The top 10 for each year are then filtered out and used for simulation of graph.
+
+```{r skills2, fig.cap="Trend in change of useful skills across occupations", out.width="100%"}
+tech_trend <- skills_dataset %>%
+  select(year,skill_group_name) %>%
+  group_by(year,skill_group_name) %>%
+  tally() %>%
+  group_by(year) %>%
+  arrange(desc(n), .by_group = TRUE)
+
+tech_trend <- by(tech_trend, tech_trend["year"], head, n=10)
+tech_trend <- Reduce(rbind,tech_trend)
+
+plot_ly(tech_trend) %>%
+  add_bars(
+    x = ~year, y = ~abs(n),
+    frame = ~year, 
+    color = ~skill_group_name,
+    line = list(simplify = FALSE)
+  ) %>%
+  layout(yaxis = list(title = "Skills trend"))
+```
+
+
 
 ## Talent Migration
 
@@ -74,10 +166,81 @@ The final aspect but supremely important one is whether the global employment tr
 
 # Analysis
 
+## Trend of skill categories across the different verticals by year
+
+After examining \@ref(fig:skills1), the below highlights were taken note of: 
+- _Soft skills_ are the one set of skills that people have **increasingly found need** for across all the verticals.
+- _Business skills_ are finding **less and less takers** by the year.
+- _Specialized industry skills_ seem to have seen volatility as they were **in decline up until 2017-2018** but with the **arrival of 2019 they saw a significant boost in demand**.
+- _Disruptive technological skills_ **do not seem to have caught on** yet except for the Information and Communication segment.
+- _Mining and Quarrying_ have seen **no disruptive tech skills growth** whatsoever.
+- Despite fintech^[@fintech] sweeping across the world, among the people employed in the field of _financial and insurance activities_ **little to no technical skills** seem to be visible.
+
+```{r}
+skills <- unique(tech_trend$skill_group_name)
+```
+- The skill that is the most in demand across all years is _`r tech_trend$skill_group_name[1]`_.
+- _Business Management, Leadership and Teamwork_ are also right behind. _Business Management_ however has been **in decline since 2017** while _Teamwork_ has **taken the forefront**.
+
+
+## Trend in change of useful skills across occupations
+
+After examining \@ref(fig:skills2), the below highlights were taken note of: 
+
+- _Digital Literacy_ remains the skill that is the **most in demand** across every year.
+- _Business Management, Leadership and Teamwork_ take up the **next 3** spots.
+- However post 2017, _Business management_ has seen a **sharp decline** in terms of importance while _Leadership and Teamwork_ are becoming **increasingly crucial**.
+
+
+```{r skills3}
+skills<- data.frame(skills)
+skills_data <- left_join(skills, skills_dataset, by= c("skills" = "skill_group_name")) %>%
+  select(skills,skill_group_category) %>%
+  unique() %>%
+  group_by(skill_group_category) %>%
+  tally()
+
+
+skills_data %>%
+  kable(align = "c", col.names = c("Category of Skill", "Number of times it occurs in top 10"), caption = "Split of the skill groups the top skills belong to between 2015-2019") %>% 
+  kable_styling("striped","hover", font_size = 13)
+
+```
+
+- From the table \@ref(tab:skills3) _`r paste(skills_data$skill_group_category[1:2], "-", skills_data$n[1:4], collapse=", ")`_ are the split across the top 2 type of skills. _Business skills_ and _Soft skills_ still **dominate**.
+- _Specialized Industry skills_ figure in this list too.
+- These are _Research_ and _Foreign Languages_. In an **increasingly interconnected world**, it is quite evident why _Foreign Languages_ make this list.
+- _Research_ also forms the **corner stone of innovation** and is an important skill to possess.
+- Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
+
+
+
 # Conclusions
+
+Professionals in today's day and time are always looking for opportunities to grow in terms of their career. There are multiple aspects to this growth and the environment needed to enrich the growth.
+
+Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
+
+As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. From above trends it is observed that hard skills like Data Driven Analytics, Fintech, Nanotechnology and soft skills like Persuasion has seen an upward trend in terms of skill gain due to migration. This can be credited to expanding technology and the growing stock markets and startup culture looking at the Venture Capital and Private Equity industry trend.
+
+However we also need to consider whether the current economy is at the state where such activities are possible and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
+
 
 # Recommendations
 
+- Professionals need to upskill in non conventional fields like social media to remain up to date.
+- Digital literacy is an important must have for this day and age.
+- Business skills and soft skills are a necessity as well for people in all fields.
+
 # Limitations
 
+- Currently the weight of the different skills according to ranking has been disregarded so some level of depth is lost in terms of importance.
+
 # Bibliography
+
+@tidyverse
+@plotly
+@kableExtra
+@rnaturalearth
+@viridis
+@sf
