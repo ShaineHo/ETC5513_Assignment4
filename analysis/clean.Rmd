@@ -47,6 +47,24 @@ talent_migration_skill <- talent_migration_skill %>%
 
 talent_migration_country <- separate(talent_migration_country, Year, into = c("A", "B", "C", "Year"), sep = "_")
 
+talent_migration_country$base_country_name <- recode(talent_migration_country$base_country_name, 
+                                                     "Bahamas, The" =	"Bahamas",
+                                                     "United States" = "USA",
+"Congo, Dem. Rep." =	"Democratic Republic of the Congo",
+"Egypt, Arab Rep." =	"Egypt",
+"United Kingdom" ="UK",
+"Hong Kong SAR, China" = "China",
+"Iran, Islamic Rep."	= "Iran",
+"Korea, Rep."	= "South Korea",
+"Macedonia, FYR" = 	"Macedonia",
+"Slovak Republic" =	"Slovakia",
+"Syrian Arab Republic" =	"Syria",
+"Trinidad and Tobago" =	"Trinidad",
+"Taiwan, China" =	"Taiwan",
+"Venezuela, RB" =	"Venezuela",
+"Yemen, Rep." =	"Yemen"
+)
+
 talent_migration_skill <- separate(talent_migration_skill, Year, into = c("A", "B", "C", "Year"), sep = "_")
 
 talent_migration_country <- talent_migration_country %>% 
