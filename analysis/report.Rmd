@@ -28,12 +28,7 @@ library(readxl)
 library(gganimate)
 library(ggrepel)
 library(rworldmap)
-library(maps)
 library(bookdown)
-library(rvest)
-library(magrittr)
-library(ggmap)
-library(stringr)
 ```
 
 
@@ -189,18 +184,31 @@ In order to analyze the annual net migration globally, we have referred to the c
 talentmig_country_summary <- talentmig_country %>% 
   select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
   group_by(base_country_name, Year) %>% 
-  summarise(netmigration = mean(Net_Migration)) 
+  summarise(netmigration = mean(Net_Migration)) %>% 
+  mutate(base_country_name = recode(base_country_name,
+                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
+                             "Dominican Republic" = "Dominica" ,
+                             `Egypt, Arab Rep.` = "Egypt" ,
+                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
+                             `Iran, Islamic Rep.` = "Iran",
+                             `Korea, Rep.` = "	South Korea",
+                             "United States" = "United States of America",
+                             "Tanzania" = "United Republic of Tanzania",
+                          "Taiwan, China" = "Taiwan",
+                          "Venezuela, RB" = "Venezuela",
+                          `Yemen, Rep.` = "Yemen"  ,
+                          "Serbia" = "Republic of Serbia"  ))
 
-map.world <- map_data("world")
+Countryjoin <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin) %>% 
+  right_join(talentmig_country_summary, by = c("admin" = "base_country_name")) 
 
-write.csv(map.world, "D:/Monash/5513/Assign 4/map.csv")
+countries <- ne_countries(returnclass = "sf", scale = "medium")
 
-countryjoin <- left_join(map.world, talentmig_country_summary, by = c('region' = 'base_country_name'))
-
-world1 <- sf::st_as_sf(map('world', plot = FALSE, fill = TRUE))
-
-worldmap <- ggplot(data = countryjoin, aes(x = long, y = lat, group = group, fill = factor(sign(netmigration)))) +
-  geom_polygon(col = "black") +
+countrytalent  <- ggplot()+
+  geom_sf(data = countries, fill = NA)+
+  geom_sf(data = Countryjoin ,
+          mapping = aes(fill = factor(sign(netmigration)))) +
  scale_colour_manual(guide = FALSE,
                      values = c("firebrick", "dodgerblue4"),
                      name = "Net Migration",
@@ -210,23 +218,10 @@ worldmap <- ggplot(data = countryjoin, aes(x = long, y = lat, group = group, fil
        subtitle = "Year: {current_frame}",
        fill = "Net Migration")+
   theme_bw()+
-  transition_manual(Year) +
-  labs(title = "Global Migration Trend from 2015-2019",
-       subtitle = "Year: {current_frame}",
-       fill = "Net Migration" ) +
-  theme(plot.title = element_text(size = 10)
-        ,plot.subtitle = element_text(size = 10)
-        ,axis.text = element_blank()
-        ,axis.title = element_blank()
-        ,axis.ticks = element_blank()
-        )
-
-animate(worldmap, fps = 1, duration = 15)
-
+  transition_manual(Year) 
+animate(countrytalent, duration = 10, fps = 5, width = 1000, height = 500, renderer = gifski_renderer())
   
 ```
-
-In above map, negative net migration(red) indicates outflow of talent i.e. emigration and positive net migration(blue) indicates inflow of talent i.e.immigration
 
 
 
