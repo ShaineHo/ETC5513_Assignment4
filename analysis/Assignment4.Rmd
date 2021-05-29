@@ -270,40 +270,27 @@ Column {data-width=600}
 talentmig_country_summary <- talentmig_country %>% 
   select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
   group_by(base_country_name, Year) %>% 
-  summarise(netmigration = mean(Net_Migration)) %>% 
-  mutate(base_country_name = recode(base_country_name,
-                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
-                             "Dominican Republic" = "Dominica" ,
-                             `Egypt, Arab Rep.` = "Egypt" ,
-                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
-                             `Iran, Islamic Rep.` = "Iran",
-                             `Korea, Rep.` = "	South Korea",
-                             "United States" = "United States of America",
-                             "Tanzania" = "United Republic of Tanzania",
-                          "Taiwan, China" = "Taiwan",
-                          "Venezuela, RB" = "Venezuela",
-                          `Yemen, Rep.` = "Yemen"  ,
-                          "Serbia" = "Republic of Serbia"  ))
+  summarise(netmigration = mean(Net_Migration)) 
 
 
-Countryjoin <- ne_countries(returnclass = "sf", scale = "medium") %>%
-  select(admin) %>% 
-  right_join(talentmig_country_summary, by = c("admin" = "base_country_name")) 
+map.world <- map_data("world")
 
-countries <- ne_countries(returnclass = "sf", scale = "medium")
+countryjoin <- left_join(map.world, talentmig_country_summary, by = c('region' = 'base_country_name'))
+world1 <- sf::st_as_sf(map('world', plot = FALSE, fill = TRUE))
 
-countrytalent  <- ggplot()+
-  geom_sf(data = countries, fill = NA)+
-  geom_sf(data = Countryjoin ,
-          mapping = aes(fill = factor(sign(netmigration)))) +
- scale_colour_manual(values = c("firebrick", "dodgerblue4"),
-                     breaks = c("Emigration", "Immigration")) +
-  labs(title = "Global Migration",
+worldmap <- ggplot(data = countryjoin, aes(x = long, y = lat, group = group, fill = factor(sign(netmigration)))) +
+  geom_polygon(col = "black") +
+  transition_manual(Year) +
+  labs(title = "Global Migration Trend from 2015-2019",
        subtitle = "Year: {current_frame}",
-       fill = "Net Migration")+
-  theme_bw()+
-  transition_manual(Year) 
-animate(countrytalent, duration = 10, fps = 5, width = 1000, height = 500, renderer = gifski_renderer())
+       fill = "Net Migration" ) +
+  theme(plot.title = element_text(size = 10)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        )
+animate(worldmap, fps = 1, duration = 15)
   
 ```
 
