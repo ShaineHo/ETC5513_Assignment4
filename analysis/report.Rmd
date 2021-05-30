@@ -70,12 +70,13 @@ The final aspect but supremely important one is whether the global employment tr
 
 # Research Questions
 
+
 - Which skills have gained or lost popularity according to the data in each vertical?
 - Which are the top few must have skills for all working professionals across the years 2015-2019?
 - Global talent migration trend from 2015 - 2019
 - Which skills have highest net migration in Business and Tech Sector?
-
-# Methodology
+- What is the global trend of employment growth?
+- How did the employment pattern change in different industries over the years? 
 
 
 ## Skills
@@ -350,6 +351,95 @@ ggplotly(ggsg2)
 
 ## Employment Growth
 
+### Global Trend of Employment Growth
+
+To analysis the global trend of employment growth, the growth rate from 2015-2019 was taken to see the rate changed over the years as shown below in Figure \@ref(fig:empgrowthmap).
+
+```{r}
+# import data
+emp_growth <- read_csv("../clean_data/emp_growth.csv")
+```
+
+```{r empgrowthmap, fig.cap = "Global trend of employment grwoth from 2015-2019" }
+emp_growth_long <- emp_growth %>% 
+  pivot_longer(cols = c("2015":"2019"), names_to = "year", values_to = "growth_rate") 
+
+emp_growth_global <- emp_growth_long %>% 
+  select(!c(isic_section_index, industry_id)) %>% 
+  group_by(country_name, year) %>% 
+  summarise(avg_growth_rate = mean(growth_rate))
+
+emp_loc <- emp_growth_global %>%
+  mutate(country_name = recode(country_name,
+                             `Congo, Dem. Rep.` = "Democratic Republic of the Congo",
+                             "Dominican Republic" = "Dominica" ,
+                             `Egypt, Arab Rep.` = "Egypt" ,
+                             `Hong Kong S.A.R.` = "Hong Kong SAR, China", 
+                             `Iran, Islamic Rep.` = "Iran",
+                             `Korea, Rep.` = "	South Korea",
+                             "United States" = "United States of America",
+                             "Tanzania" = "United Republic of Tanzania",
+                          "Taiwan, China" = "Taiwan",
+                          "Venezuela, RB" = "Venezuela",
+                          `Yemen, Rep.` = "Yemen"  ,
+                          "Serbia" = "Republic of Serbia"  ))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin)
+
+`full.list.map.time` <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(admin) %>% 
+  right_join(emp_growth_global, by = c("admin" = "country_name")) 
+
+emp_map  <- ggplot()+
+  geom_sf(data = countries, fill = NA)+
+  geom_sf(data = `full.list.map.time` %>% 
+            filter(!is.na(year)), mapping = aes(fill = avg_growth_rate))+
+  scale_fill_viridis(na.value="white")+
+  labs(title = "Change of employment growth rate",
+       subtitle = "Year: {current_frame}",
+       fill = "Growth_rate")+
+  theme_bw()+
+  transition_manual(year)
+
+animate(emp_map, duration = 5, fps = 20, width = 1000, height = 500, renderer = gifski_renderer())
+
+```
+
+Based on Figure \@ref(fig:empgrowthmap), it is found that the employment growth rate in high income areas such as the USA, European countries and Australia were *slowing down*. However, the other income groups had an *increasing trend* on the growth rate. Further details will be elaborated in the next section.
+
+### Trend of employment growth rate in different industries and income groups
+
+In order to analysis the further development of the trend, the growth rate is separated in different income groups and industries as shown in Figure \@ref(fig:empgrowthlines):
+
+```{r empgrowthlines, fig.cap = "Trend of employment growth rate based on industries" ,fig.height = 4}
+emp_growth_new <- emp_growth %>% 
+  pivot_longer(cols = c("2015":"2019"), names_to = "year", values_to = "growth_rate") %>% 
+  select(!c(isic_section_index, industry_id))
+
+emp_trend <- emp_growth_new %>% 
+  group_by(isic_section_name, year, wb_income) %>% 
+  summarise(avg_growth_rate = mean(growth_rate)*100) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  ggplot(aes(x = year,
+             y = avg_growth_rate,
+             color = isic_section_name))+
+  labs(color = "Section Name")+
+  geom_line()+
+  facet_wrap(~wb_income, ncol = 2)+
+      theme(legend.position="bottom")+
+  theme_bw()
+
+ggplotly(emp_trend) 
+```
+
+Based on Figure \@ref(fig:empgrowthlines), the high income group had a downwards slope on employment growth rate whereas the other groups had an increasing trends. The reasons are as follow:
+
+- The low **oil price had delayed the interest rate hikes in the high income countries**. However, it has **brought opportunities to oil importing countries** like India and China, which lowered the production cost and increased the competitive of the products produced. ^[@oilprice] This slowed down the development in high income countries meanwhile swapped the chances to the other income groups.
+
+- The **political disputes** threatened the global growth. For example, the "Trade wars" between China and the USA  had brought chaos to the global market which badly affect the global economy. This eventually shrank the employment growth. ^[@tradeconflict]
+
+
 
 # Analysis
 
@@ -377,7 +467,6 @@ After examining \@ref(fig:skills2), the below highlights were taken note of:
 - _Digital Literacy_ remains the skill that is the **most in demand** across every year.
 - _Business Management, Leadership and Teamwork_ take up the **next 3** spots.
 - However post 2017, _Business management_ has seen a **sharp decline** in terms of importance while _Leadership and Teamwork_ are becoming **increasingly crucial**.
-
 
 ```{r skills3}
 skills<- data.frame(skills)
@@ -432,6 +521,38 @@ __Top Skill Gains in High Income Countries in 2019 due to migration__
 - Tax Accounting <br>
 - Bookkeeping <br>
 
+## Trend in employment rate
+
+### Employment growth
+
+```{r empgrowth}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange(desc(avg_growth_pct)) %>% 
+  head(5) %>% 
+   kable(align = "c", col.names = c("Industry Name", "Average Persentage of Growth"), caption = "Top 5 employment growth industries") %>% 
+  kable_styling("striped","hover", font_size = 13)
+
+```
+
+Based on Table \@ref(tab:empgrowth), it is found that **venture capital & private equity industry**, which catalyzed technological innovation, had the highest average growth between 2015-2019. The possible reason is that the **new rapid boom in information technology industry required great amount of capital investment**, which boost the growth in these industries. 
+
+### Employment recession
+
+```{r emprecession}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange((avg_growth_pct)) %>% 
+  head(5) %>% 
+  kable(align = "c", col.names = c("Industry Name", "Average Percentage of Growth"), caption = "Top 5 employment recession industries") %>% 
+  kable_styling("striped","hover", font_size = 13)
+```
+
+According to Table \@ref(tab:emprecession), the **traditional media** like newspapers, telecommunications,etc had the **higher recession** from 2015-2019. It is because of the **great boom in social media and social network**. People tend to watch the news online and communicate on social media apps which had shrank the development in traditional media.
 
 # Conclusions
 
@@ -450,10 +571,12 @@ However we also need to consider whether the current economy is at the state whe
 - Digital literacy is an important must have for this day and age.
 - Business skills and soft skills are a necessity as well for people in all fields.
 - Tech skills are evergreen. Skills like Scientific Computing are new age era skills.
+- Try to look for jobs in financial and information technology industries, avoid to look for the jobs in traditional media industry.
 
 # Limitations
 
 - Currently the weight of the different skills according to ranking has been disregarded so some level of depth is lost in terms of importance.
+- The employment growth rate is observed in global trend, it may not be accurate when it came to specific local analysis.
 
 # Bibliography
 
@@ -463,3 +586,10 @@ However we also need to consider whether the current economy is at the state whe
 @rnaturalearth
 @viridis
 @sf
+@RColorBrewer
+@rgeos
+@readxl
+@gganimate
+@ggrepel
+@rworldmap
+@bookdown
