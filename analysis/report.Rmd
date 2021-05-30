@@ -219,8 +219,6 @@ animate(emp_map, duration = 5, fps = 20, width = 1000, height = 500, renderer = 
 
 ```
 
-Based on Figure \@ref(fig:empgrowthmap), it is found that the employment growth rate in high income areas such as the USA, European countries and Australia were *slowing down*. However, the other income groups had an *increasing trend* on the growth rate. Further details will be elaborated in the next section.
-
 ### Trend of employment growth rate in different industries and income groups
 
 In order to analysis the further development of the trend, the growth rate is separated in different income groups and industries as shown in Figure \@ref(fig:empgrowthlines):
@@ -245,14 +243,6 @@ emp_trend <- emp_growth_new %>%
 
 ggplotly(emp_trend) 
 ```
-
-Based on Figure \@ref(fig:empgrowthlines), the high income group had a downwards slope on employment growth rate whereas the other groups had an increasing trends. The reasons are as follow:
-
-- The low **oil price had delayed the interest rate hikes in the high income countries**. However, it has **brought opportunities to oil importing countries** like India and China, which lowered the production cost and increased the competitive of the products produced. ^[@oilprice] This slowed down the development in high income countries meanwhile swapped the chances to the other income groups.
-
-- The **political disputes** threatened the global growth. For example, the "Trade wars" between China and the USA  had brought chaos to the global market which badly affect the global economy. This eventually shrank the employment growth. ^[@tradeconflict]
-
-
 
 # Analysis
 
@@ -304,6 +294,15 @@ skills_data %>%
 - Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 ## Trend in employment rate
+
+### Global Trend of Employment Growth
+
+According to Figure \@ref(fig:empgrowthmap), it is found that the employment growth rate in high income areas such as the USA, European countries and Australia were **slowing down**. However, the other income groups had an **increasing trend** on the growth rate. Whereas based on Figure \@ref(fig:empgrowthlines), the high income group had a downwards slope on employment growth rate whereas the other groups had an increasing trends. The reasons are as follow:
+
+- The low **oil price had delayed the interest rate hikes in the high income countries**. However, it has **brought opportunities to oil importing countries** like India and China, which lowered the production cost and increased the competitive of the products produced. ^[@oilprice] This slowed down the development in high income countries meanwhile swapped the chances to the other income groups.
+
+- The **political disputes** threatened the global growth. For example, the "Trade wars" between China and the USA  had brought chaos to the global market which badly affect the global economy. This eventually shrank the employment growth. ^[@tradeconflict]
+
 
 ### Employment growth
 
@@ -374,5 +373,3 @@ However we also need to consider whether the current economy is at the state whe
 @ggrepel
 @rworldmap
 @bookdown
-@oilprice
-@tradeconflict
