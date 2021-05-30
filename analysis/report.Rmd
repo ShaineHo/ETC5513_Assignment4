@@ -278,7 +278,7 @@ talentmig_industry_country
 
 ### Skill Gain Trend 2015-2019 
 
-Most high-skilled workers, in particular those with tech and business skills, choose to migrate to a different country with more lucrative opportunities. In Figures \@ref(fig:tech) and \@ref(fig:business) we observe the top 5 Tech and Business skilled occupation which show gains in skilled workers due to migration to high income countries from 2015-2109.
+Most high-skilled workers, in particular those with tech and business skills, choose to migrate to a different country with more lucrative opportunities. In Figures \@ref(fig:tech) and \@ref(fig:business) we observe the top 5 Tech and Business skilled occupation which show gains in skilled workers due to migration to high income countries from 2015-2019.
 
 
 ```{r tech, fig.cap="Top 5 Tech Skill gains in High Income countries from 2015-2019"}
@@ -594,4 +594,3 @@ However we also need to consider whether the current economy is at the state whe
 @bookdown
 @maps
 @ggmap
-@stringr

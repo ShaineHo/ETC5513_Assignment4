@@ -32,3 +32,5 @@ All of these will be taken to provide recommendations to the young professionals
 - data contains raw data.
 
 - clean_data contains clean data.
+
+_ **As html is converted to pdf, the interactivity of plots is lost, and some of the plots got cropped**.
