@@ -76,6 +76,7 @@ The final aspect but supremely important one is whether the global employment tr
 - What is the global trend of employment growth?
 - How did the employment pattern change in different industries over the years? 
 
+# Methodology
 
 ## Skills
 
