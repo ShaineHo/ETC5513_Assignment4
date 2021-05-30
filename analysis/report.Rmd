@@ -30,8 +30,6 @@ library(ggrepel)
 library(rworldmap)
 library(bookdown)
 library(maps)
-library(rvest)
-library(magrittr)
 library(ggmap)
 library(stringr)
 ```
@@ -593,3 +591,6 @@ However we also need to consider whether the current economy is at the state whe
 @ggrepel
 @rworldmap
 @bookdown
+@maps
+@ggmap
+@stringr
