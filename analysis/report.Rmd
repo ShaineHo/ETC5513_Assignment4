@@ -488,7 +488,9 @@ skills_data %>%
 - Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
 
-## Global Talent Migration Trend from 2015-2019
+## Trend in Talent Migration
+
+### Global Talent Migration Trend from 2015-2019
 
 - The __Middle East and North Africa, Latin America and the Caribbean, and South Asia__ have seen the greatest talent loss in recent years, whereas __UAE__ in addition to Organization for Economic Cooperation and Development (OECD) countries such as __USA, Canada, Australia, New Zealand and Europe__ are attracting the most talent.
 - __Latin American countries like Cuba, Jamaica and Haiti__ have the highest net emigration. Which can be due to poor quality jobs and falling real wages.
@@ -496,12 +498,12 @@ skills_data %>%
 - __Qatar__ and __Kuwait__ are observed to be top countries for energy industries
 - __Luxembourg__ is observed to be the hotspot for most industries for highest gains in terms of skilled worker migration. __Luxembourg__ is considered to be the economic powerhouse of the Greater Region and the financial hotspot on the European continent. Luxembourg's thriving economy is a major argument for many foreign nationals to live in the country. The country's health insurance and social security systems, its high quality infrastructures and the government's support for families has led to one of the world's highest quality of life standards. Multilingual environment: When so many people from all parts of the world come together, communication is key. Luxembourg's population has always been multilingual, making it easy for foreigners to take part in an open and welcoming society ^[@luxembourg]
 
-## Skill Gain due to Migration
+### Skill Gain due to Migration
 
 Most skilled workers migrate to a different country in search of lucrative job opportunities. It is preferable to migrate to a higher income country which have more promising job opportunities. In the above plots, we can observe the following in high income countries:
 
-- In traditional business occupations like Bookkeeping, Tax Accounting, Economics have shown a downward trend, concluding that there are fewer people with business skills opting to migrate to another country in search of jobs. <br>
-- People with tech skills that are choosing to migrate to high income countries are mainly skilled in domains like Scientific Computing and Mobile Application Development which have shown a steep upward trend. <br>
+- In traditional business occupations like __Bookkeeping, Tax Accounting, Economics__ have shown a downward trend, concluding that there are fewer people with business skills opting to migrate to another country in search of jobs. <br>
+- People with tech skills that are choosing to migrate to high income countries are mainly skilled in domains like __Scientific Computing and Mobile Application Development__ which have shown a steep upward trend. <br>
 
 __Top Skill Gains in High Income Countries in 2019 due to migration__
 
