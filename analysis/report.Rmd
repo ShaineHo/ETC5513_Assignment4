@@ -219,7 +219,7 @@ animate(emp_map, duration = 5, fps = 20, width = 1000, height = 500, renderer = 
 
 ```
 
-Based on Figure \@ref(fig:empgrowthmap), it is found that the employment growth rate in high income areas such as the USA, European countries and Australia were slowing down. However, the other income groups had an increasing trend on the growth rate. Further details will be elaborated in the next section.
+Based on Figure \@ref(fig:empgrowthmap), it is found that the employment growth rate in high income areas such as the USA, European countries and Australia were *slowing down*. However, the other income groups had an *increasing trend* on the growth rate. Further details will be elaborated in the next section.
 
 ### Trend of employment growth rate in different industries and income groups
 
@@ -248,9 +248,9 @@ ggplotly(emp_trend)
 
 Based on Figure \@ref(fig:empgrowthlines), the high income group had a downwards slope on employment growth rate whereas the other groups had an increasing trends. The reasons are as follow:
 
-- The low oil price had delayed the interest rate hikes in the high income countries. However, it has brought opportunities to oil importing countries like India and China, which lowered the production cost and increased the competitive of the products produced. ^[@oilprice] This slowed down the development in high income countries meanwhile swapped the chances to the other income groups.
+- The low **oil price had delayed the interest rate hikes in the high income countries**. However, it has **brought opportunities to oil importing countries** like India and China, which lowered the production cost and increased the competitive of the products produced. ^[@oilprice] This slowed down the development in high income countries meanwhile swapped the chances to the other income groups.
 
-- The political disputes threatened the global growth. For example, the "trade wars" between China and the USA  had brought chaos to the global market which badly affect the global economy. This eventually shrank the employment growth. ^[@tradeconflict]
+- The **political disputes** threatened the global growth. For example, the "Trade wars" between China and the USA  had brought chaos to the global market which badly affect the global economy. This eventually shrank the employment growth. ^[@tradeconflict]
 
 
 
@@ -303,7 +303,38 @@ skills_data %>%
 - _Research_ also forms the **corner stone of innovation** and is an important skill to possess.
 - Apart from this, _Social media_ is also a **technological main stay** which figures prominently. This is yet another proof of the influence of technology on skills needed.
 
+## Trend in employment rate
 
+### Employment growth
+
+```{r empgrowth}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange(desc(avg_growth_pct)) %>% 
+  head(5) %>% 
+   kable(align = "c", col.names = c("Industry Name", "Average Persentage of Growth"), caption = "Top 5 employment growth industries") %>% 
+  kable_styling("striped","hover", font_size = 13)
+
+```
+
+Based on Table \@ref(tab:empgrowth), it is found that **venture capital & private equity industry**, which catalyzed technological innovation, had the highest average growth between 2015-2019. The possible reason is that the **new rapid boom in information technology industry required great amount of capital investment**, which boost the growth in these industries. 
+
+### Employment recession
+
+```{r emprecession}
+emp_growth_long %>% 
+  select(industry_name, year, growth_rate) %>% 
+  group_by(industry_name) %>% 
+  summarise(avg_growth_pct = mean(growth_rate)*100) %>% 
+  arrange((avg_growth_pct)) %>% 
+  head(5) %>% 
+  kable(align = "c", col.names = c("Industry Name", "Average Percentage of Growth"), caption = "Top 5 employment recession industries") %>% 
+  kable_styling("striped","hover", font_size = 13)
+```
+
+According to Table \@ref(tab:emprecession), the **traditional media** like newspapers, telecommunications,etc had the **higher recession** from 2015-2019. It is because of the **great boom in social media and social network**. People tend to watch the news online and communicate on social media apps which had shrank the development in traditional media.
 
 # Conclusions
 
@@ -321,10 +352,12 @@ However we also need to consider whether the current economy is at the state whe
 - Professionals need to upskill in non conventional fields like social media to remain up to date.
 - Digital literacy is an important must have for this day and age.
 - Business skills and soft skills are a necessity as well for people in all fields.
+- Try to look for jobs in financial and information technology industries, avoid to look for the jobs in traditional media industry.
 
 # Limitations
 
 - Currently the weight of the different skills according to ranking has been disregarded so some level of depth is lost in terms of importance.
+- The employment growth rate is observed in global trend, it may not be accurate when it came to specific local analysis.
 
 # Bibliography
 
@@ -334,3 +367,12 @@ However we also need to consider whether the current economy is at the state whe
 @rnaturalearth
 @viridis
 @sf
+@RColorBrewer
+@rgeos
+@readxl
+@gganimate
+@ggrepel
+@rworldmap
+@bookdown
+@oilprice
+@tradeconflict
