@@ -70,8 +70,8 @@ The final aspect but supremely important one is whether the global employment tr
 
 # Research Questions
 
-- Which skills are gaining or losing popularity according to the data in each vertical?
-- Which are the top few must have skills for all working professionals across the years?
+- Which skills have gained or lost popularity according to the data in each vertical?
+- Which are the top few must have skills for all working professionals across the years 2015-2019?
 - Global talent migration trend from 2015 - 2019
 - Which skills have highest net migration in Business and Tech Sector?
 
