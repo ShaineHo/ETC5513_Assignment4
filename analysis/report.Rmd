@@ -12,6 +12,7 @@ output:
     citation_package: biblatex
     toc: true
     toc_float: true
+    fig_crop: false
 ---
 
 ```{r setup, include=FALSE}
@@ -31,7 +32,6 @@ library(rworldmap)
 library(bookdown)
 library(maps)
 library(ggmap)
-library(stringr)
 ```
 
 
@@ -492,23 +492,23 @@ skills_data %>%
 
 Most skilled workers migrate to a different country in search of lucrative job opportunities. It is preferable to migrate to a higher income country which have more promising job opportunities. In the above plots, we can observe the following in high income countries:
 
-- In traditional business occupations like __Bookkeeping, Tax Accounting, Economics__ have shown a downward trend, concluding that there are fewer people with business skills opting to migrate to another country in search of jobs. <br>
-- People with tech skills that are choosing to migrate to high income countries are mainly skilled in domains like __Scientific Computing and Mobile Application Development__ which have shown a steep upward trend. <br>
+- In traditional business occupations like __Bookkeeping, Tax Accounting, Economics__ have shown a downward trend, concluding that there are fewer people with business skills opting to migrate to another country in search of jobs. 
+- People with tech skills that are choosing to migrate to high income countries are mainly skilled in domains like __Scientific Computing and Mobile Application Development__ which have shown a steep upward trend. 
 
 __Top Skill Gains in High Income Countries in 2019 due to migration__
 
 *Tech Skills* <br>
 - Scientific Computing <br>
 - Mobile Application Development <br>
-- Web Hosting - Upcoming skills with Cloud computing trend <br>
+- Web Hosting - Upcoming skills with Cloud computing trend <br> 
 - Web Development <br>
 - Computer Hardware <br>
 
 *Business Skills* <br>
-- Competitive Strategies <br>
+- Competitive Strategies <br> 
 - Customer Service Systems <br>
 - Economics <br>
-- Tax Accounting <br>
+- Tax Accounting <br> 
 - Bookkeeping <br>
 
 ## Trend in employment rate
@@ -559,7 +559,7 @@ Professionals in today's day and time are always looking for opportunities to gr
 
 Skills are front and center in terms of must-haves for a fruitful career. From the analysis it is clear that soft skills are a necessity regardless of vertical. Business skills have no longer remained the mainstay that they used to be and tech skills are here to stay however their disruptiveness in every sector is up for debate.
 
-As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. Rising technology and expanding business in high income countries are attracting highly skilled workers. From above trends it is observed that tech skills like Scientific Computing and Mobile Application Development has seen an upward trend in terms of skill gain due to migration. This can be attributed to rise of technology. Business Skills like Competitive Strategies are new age era skills that have a potential market in high income countries for expanding business.
+As one chooses to upskill, they find it harder to stay stationary within their old environment and migrate to greener pastures. Rising technology and expanding business in high income countries are attracting skilled workers. From above trends it is observed that tech skills like Scientific Computing and Mobile Application Development has seen an upward trend in terms of skill gain due to migration. This can be attributed to rise of technology. Business Skills like Competitive Strategies are new age era skills that have a potential market in high income countries for expanding business.
 
 However we also need to consider whether the current economy is at the state where such activities are possible and employment growth would directly relate to whether the upskilling has to do with retaining jobs or switching them out. The Information and communication sector has a rapid boom in recent years which indicates that there are larger demand of labor whereas the recession in traditional media and communications sectors cause more and more labor being laid off.
 
@@ -575,6 +575,7 @@ However we also need to consider whether the current economy is at the state whe
 # Limitations
 
 - Currently the weight of the different skills according to ranking has been disregarded so some level of depth is lost in terms of importance.
+- Skill gain due to talent migration trend for lower income and middle income countries has not been taken into account 
 - The employment growth rate is observed in global trend, it may not be accurate when it came to specific local analysis.
 
 # Bibliography

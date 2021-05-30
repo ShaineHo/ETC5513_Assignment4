@@ -21,9 +21,8 @@ library(readxl)
 library(gganimate)
 library(ggrepel)
 library(rworldmap)
-library(jpeg)
-library(treemap)
-
+library(maps)
+library(ggmap)
 ```
 
 Introduction {.tabset}
@@ -237,28 +236,24 @@ talentmig_country %>%
   
 ```
 
-###Analysis
 
-__Top Skill Gains due to migration__
+### Analysis
 
-- Debt Collection skill - Shows an upward trend 
-- Fintech 
-- Persuasion skills
-- Data-Driven Analytics
-- Nanotechnology
-- Nuclear Physics
-- Web Hosting
+__Top Skill Gains in High Income Countries in 2019 due to migration__
 
-__Maximum Skill Loss due to migration__
+*Tech Skills* <br>
+- Scientific Computing <br>
+- Mobile Application Development <br>
+- Web Hosting - Upcoming skills with Cloud computing trend <br>
+- Web Development <br>
+- Computer Hardware <br>
 
-- Investor Relations & Partner Development
-- Aerospace Engineering
-- Material Science
-- Time Management
-- Communication
-- Paediatrics
-- Computer Graphics and Social Media
-
+*Business Skills* <br>
+- Competitive Strategies <br>
+- Customer Service Systems <br>
+- Economics <br>
+- Tax Accounting <br>
+- Bookkeeping <br>
 
 
 Column {data-width=600}
@@ -267,6 +262,7 @@ Column {data-width=600}
 ### Global Migration Trend
 
 ```{r}
+
 talentmig_country_summary <- talentmig_country %>% 
   select(base_country_name, Net_Migration, Year, base_country_wb_region, base_country_wb_income) %>%
   group_by(base_country_name, Year) %>% 
@@ -291,6 +287,7 @@ worldmap <- ggplot(data = countryjoin, aes(x = long, y = lat, group = group, fil
         ,axis.ticks = element_blank()
         )
 animate(worldmap, fps = 1, duration = 15)
+
   
 ```
 
@@ -298,9 +295,10 @@ animate(worldmap, fps = 1, duration = 15)
 
 ### Top Skill Gains in Tech
 
-```{r tech, fig.cap="Top 5 Skill gains in Tech Industry from 2015-2019"}
+```{r tech, fig.cap="Top 5 Tech Skill gains in High Income countries from 2015-2019"}
 
-talentmig_skill_summary <- talentmig_skill %>% 
+talentmig_skill_summary <- talentmig_skill %>%
+  filter(wb_income == "High income", ) %>% 
   group_by(skill_group_name, skill_group_category, Year) %>% 
   summarise(netmigration = mean(Net_Migration)) %>%
   na.omit(skill_group_name)
@@ -335,7 +333,7 @@ ggplotly(ggsl)
 
 ### Top Skill Gains in Tech
 
-```{r business, fig.cap="Top 5 Skill gains in Business Industry from 2015-2019"}
+```{r business, fig.cap="Top 5 Business Skill gains in High Income countries from 2015-2019"}
 
 ggsg2 <- talentmig_skill_summary %>%
   filter(netmigration > 0, skill_group_category == "Business Skills") %>% 
@@ -360,6 +358,7 @@ ggsg2 <- talentmig_skill_summary %>%
   ) 
 
 ggplotly(ggsg2)
+
 ```
 
 
