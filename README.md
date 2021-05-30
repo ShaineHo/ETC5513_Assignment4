@@ -33,4 +33,4 @@ All of these will be taken to provide recommendations to the young professionals
 
 - clean_data contains clean data.
 
-_ **As html is converted to pdf, the interactivity of plots is lost, and some of the plots got cropped**.
+- **As html is converted to pdf, the interactivity of plots is lost, and some of the plots got cropped**.
